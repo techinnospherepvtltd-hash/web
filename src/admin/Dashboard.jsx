@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { fetchExcelData, saveExcelDataLocal, downloadExcel } from '../utils/excelUtils';
 import * as XLSX from 'xlsx';
-import { LogOut, Download, Upload, Plus, Trash2, LayoutDashboard, Database, Activity } from 'lucide-react';
+import { LogOut, Download, Upload, Plus, Trash2, LayoutDashboard, Database, Activity, Settings } from 'lucide-react';
+import { useConfig } from '../context/ConfigContext';
 
 const tabs = [
   { id: 'dashboard', name: 'Analytics', icon: LayoutDashboard },
   { id: 'projects.xlsx', name: 'Projects', icon: Database },
   { id: 'services.xlsx', name: 'Services', icon: Database },
-  { id: 'config.xlsx', name: 'Home CMS Config', icon: Database },
+  { id: 'config.xlsx', name: 'Site Settings', icon: Settings },
   { id: 'news.xlsx', name: 'News', icon: Database },
   { id: 'jobs.xlsx', name: 'Careers', icon: Database },
   { id: 'clients.xlsx', name: 'Clients', icon: Database },
@@ -19,6 +20,7 @@ const Dashboard = ({ onLogout }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState({});
+  const config = useConfig();
 
   useEffect(() => {
     if (activeTab === 'dashboard') {
@@ -72,6 +74,9 @@ const Dashboard = ({ onLogout }) => {
       const result = XLSX.utils.sheet_to_json(ws);
       setData(result);
       saveExcelDataLocal(activeTab, result);
+      if (activeTab === 'config.xlsx') {
+        window.location.reload(); // Reload to apply settings immediately
+      }
     };
     reader.readAsBinaryString(file);
     e.target.value = null; // reset input
@@ -82,6 +87,7 @@ const Dashboard = ({ onLogout }) => {
     newData.splice(index, 1);
     setData(newData);
     saveExcelDataLocal(activeTab, newData);
+    if (activeTab === 'config.xlsx') window.location.reload();
   };
 
   const handleAddRow = () => {
@@ -90,7 +96,8 @@ const Dashboard = ({ onLogout }) => {
     if (data.length > 0) {
       Object.keys(data[0]).forEach(key => newRow[key] = '');
     } else {
-      newRow['New_Column'] = '';
+      newRow['Key'] = '';
+      newRow['Value'] = '';
     }
     newData.push(newRow);
     setData(newData);
@@ -104,13 +111,25 @@ const Dashboard = ({ onLogout }) => {
     saveExcelDataLocal(activeTab, newData);
   };
 
+  const handleSaveSettings = () => {
+    if (activeTab === 'config.xlsx') {
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex flex-col md:flex-row">
       {/* Sidebar */}
       <div className="w-full md:w-64 bg-[#111827] text-white p-6 flex flex-col shadow-2xl z-20">
         <div className="mb-10 flex items-center gap-3">
-          <Activity className="w-8 h-8 text-brand-primary" />
-          <h2 className="text-xl font-bold tracking-tight">Admin Portal</h2>
+          {config?.CompanyLogo ? (
+            <img src={config.CompanyLogo} alt="Admin Logo" className="h-8 object-contain filter brightness-0 invert" />
+          ) : (
+            <>
+              <Activity className="w-8 h-8 text-brand-primary" />
+              <h2 className="text-xl font-bold tracking-tight">Admin Portal</h2>
+            </>
+          )}
         </div>
         <nav className="flex-grow space-y-1">
           {tabs.map(tab => {
@@ -171,6 +190,11 @@ const Dashboard = ({ onLogout }) => {
                 Manage {tabs.find(t => t.id === activeTab)?.name}
               </h1>
               <div className="flex gap-4">
+                {activeTab === 'config.xlsx' && (
+                  <button onClick={handleSaveSettings} className="flex items-center gap-2 px-4 py-2 bg-[#111827] text-white rounded-lg hover:bg-brand-primary transition-all font-semibold text-sm shadow-md">
+                    <Activity className="w-4 h-4" /> Save & Refresh
+                  </button>
+                )}
                 <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all font-semibold text-sm shadow-sm">
                   <Download className="w-4 h-4" /> Export CSV
                 </button>

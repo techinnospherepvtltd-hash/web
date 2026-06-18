@@ -19,17 +19,21 @@ const services = [
 ];
 
 const config = [
+  { Key: "CompanyName", Value: "TechInnoSphere" },
+  { Key: "CompanyLogo", Value: "" },
+  { Key: "Favicon", Value: "" },
+  { Key: "WhatsAppNumber", Value: "+917710031550" },
+  { Key: "InstagramURL", Value: "https://www.instagram.com/techinnosphere/" },
+  { Key: "FacebookURL", Value: "https://www.facebook.com/profile.php?id=61584937588072" },
+  { Key: "CompanyAddress", Value: "Mumbai, Maharashtra, India" },
+  { Key: "ContactEmail", Value: "careers@techinnosphere.com" },
+  { Key: "FooterContent", Value: "© TechInnoSphere. All Rights Reserved." },
   { Key: "HeroHeading", Value: "Engineering Scalable Digital Systems" },
   { Key: "HeroSubheading", Value: "TechInnoSphere delivers premium Web Development, AI Solutions, Security Testing, and Enterprise Software." },
   { Key: "HeroButtonPrimaryText", Value: "Start Your Project" },
   { Key: "HeroButtonPrimaryLink", Value: "/contact" },
   { Key: "HeroButtonSecondaryText", Value: "View Our Work" },
   { Key: "HeroButtonSecondaryLink", Value: "/work" },
-  { Key: "ContactEmail", Value: "contact@techinnosphere.com" },
-  { Key: "ContactPhone", Value: "+91 9999999999" },
-  { Key: "ContactAddress", Value: "Mumbai, Maharashtra, India" },
-  { Key: "LinkedInURL", Value: "https://linkedin.com" },
-  { Key: "TwitterURL", Value: "https://twitter.com" },
   { Key: "CompanyTagline", Value: "From Vision To Software We Build It All." }
 ];
 

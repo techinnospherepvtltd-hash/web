@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import FloatingWhatsApp from './components/FloatingWhatsApp';
+import { ConfigProvider } from './context/ConfigContext';
 
 // Pages
 import Home from './pages/Home';
@@ -16,26 +18,29 @@ import AdminLayout from './admin/AdminLayout';
 
 function App() {
   return (
-    <Router basename={import.meta.env.BASE_URL}>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/work" element={<Work />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/news" element={<News />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/*" element={<AdminLayout />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ConfigProvider>
+      <Router basename={import.meta.env.BASE_URL}>
+        <div className="flex flex-col min-h-screen">
+          <Navbar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/work" element={<Work />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/news" element={<News />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/*" element={<AdminLayout />} />
+            </Routes>
+          </main>
+          <Footer />
+          <FloatingWhatsApp />
+        </div>
+      </Router>
+    </ConfigProvider>
   );
 }
 
