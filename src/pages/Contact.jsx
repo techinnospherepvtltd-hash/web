@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Send, MessageCircle, Instagram, Facebook } from 'lucide-react';
+import { MapPin, Phone, Mail, Send, MessageCircle } from 'lucide-react';
+import { InstagramIcon, FacebookIcon } from '../components/SocialIcons';
 import { useConfig } from '../context/ConfigContext';
 
 const Contact = () => {
@@ -52,12 +53,12 @@ const Contact = () => {
               <div className="flex gap-4">
                 {config.InstagramURL && (
                   <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-pink-50 hover:text-pink-600 transition-colors text-gray-500">
-                    <Instagram className="w-5 h-5" />
+                    <InstagramIcon className="w-5 h-5" />
                   </a>
                 )}
                 {config.FacebookURL && (
                   <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-colors text-gray-500">
-                    <Facebook className="w-5 h-5" />
+                    <FacebookIcon className="w-5 h-5" />
                   </a>
                 )}
               </div>

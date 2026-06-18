@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Globe, Mail, Phone, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Globe, Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import { InstagramIcon, FacebookIcon } from './SocialIcons';
 import { useConfig } from '../context/ConfigContext';
 
 const Footer = () => {
@@ -32,12 +33,12 @@ const Footer = () => {
             <div className="flex gap-4">
               {config.InstagramURL && (
                 <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-pink-600 transition-colors text-gray-300 hover:text-white">
-                  <Instagram className="w-5 h-5" />
+                  <InstagramIcon className="w-5 h-5" />
                 </a>
               )}
               {config.FacebookURL && (
                 <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-blue-600 transition-colors text-gray-300 hover:text-white">
-                  <Facebook className="w-5 h-5" />
+                  <FacebookIcon className="w-5 h-5" />
                 </a>
               )}
               {config.WhatsAppNumber && (

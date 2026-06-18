@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
+import { InstagramIcon, FacebookIcon } from './SocialIcons';
 import { useConfig } from '../context/ConfigContext';
 
 const Navbar = () => {
@@ -62,12 +63,12 @@ const Navbar = () => {
           <div className="flex items-center gap-3 border-r border-gray-200 pr-4">
             {config.InstagramURL && (
               <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-pink-600 transition-colors">
-                <Instagram className="w-5 h-5" />
+                <InstagramIcon className="w-5 h-5" />
               </a>
             )}
             {config.FacebookURL && (
               <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
-                <Facebook className="w-5 h-5" />
+                <FacebookIcon className="w-5 h-5" />
               </a>
             )}
             {config.WhatsAppNumber && (
@@ -110,12 +111,12 @@ const Navbar = () => {
           <div className="pt-6 border-t border-gray-100 flex gap-6 justify-center">
             {config.InstagramURL && (
               <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-pink-600">
-                <Instagram className="w-6 h-6" />
+                <InstagramIcon className="w-6 h-6" />
               </a>
             )}
             {config.FacebookURL && (
               <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600">
-                <Facebook className="w-6 h-6" />
+                <FacebookIcon className="w-6 h-6" />
               </a>
             )}
             {config.WhatsAppNumber && (
