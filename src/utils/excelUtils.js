@@ -8,7 +8,7 @@ export const fetchExcelData = async (fileName) => {
       return JSON.parse(localData);
     }
 
-    const response = await fetch(`/${fileName}`);
+    const response = await fetch(`${import.meta.env.BASE_URL}${fileName}`);
     if (!response.ok) return [];
     
     const arrayBuffer = await response.arrayBuffer();
