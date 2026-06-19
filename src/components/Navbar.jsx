@@ -37,7 +37,7 @@ const Navbar = () => {
       <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 z-50">
           {config.CompanyLogo ? (
-            <img src={config.CompanyLogo} alt={config.CompanyName} className="h-10 object-contain" />
+            <img src={config.CompanyLogo} alt={config.CompanyName} className="h-14 md:h-16 object-contain" />
           ) : (
             <span className={`text-xl font-bold tracking-tighter ${isScrolled ? 'text-brand-darker' : 'text-brand-darker'}`}>
               {config.CompanyName || 'TechInnoSphere'}

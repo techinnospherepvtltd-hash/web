@@ -123,7 +123,7 @@ const Dashboard = ({ onLogout }) => {
       <div className="w-full md:w-64 bg-[#111827] text-white p-6 flex flex-col shadow-2xl z-20">
         <div className="mb-10 flex items-center gap-3">
           {config?.CompanyLogo ? (
-            <img src={config.CompanyLogo} alt="Admin Logo" className="h-8 object-contain filter brightness-0 invert" />
+            <img src={config.CompanyLogo} alt="Admin Logo" className="h-14 object-contain" />
           ) : (
             <>
               <Activity className="w-8 h-8 text-brand-primary" />

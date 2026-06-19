@@ -30,7 +30,7 @@ const Login = ({ onLogin }) => {
         <div>
           <div className="flex justify-center mb-6">
             {config.CompanyLogo ? (
-              <img src={config.CompanyLogo} alt={config.CompanyName} className="h-16 object-contain" />
+              <img src={config.CompanyLogo} alt={config.CompanyName} className="h-28 object-contain" />
             ) : (
               <span className="text-3xl font-black text-[#111827] tracking-tighter">
                 {config.CompanyName || 'TechInnoSphere'}
