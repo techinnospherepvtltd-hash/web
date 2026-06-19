@@ -29,7 +29,7 @@ const config = [
   { Key: "ContactEmail", Value: "careers@techinnosphere.com" },
   { Key: "FooterContent", Value: "© TechInnoSphere. All Rights Reserved." },
   { Key: "HeroHeading", Value: "Engineering Scalable Digital Systems" },
-  { Key: "HeroSubheading", Value: "TechInnoSphere delivers premium Web Development, AI Solutions, Security Testing, and Enterprise Software." },
+  { Key: "HeroSubheading", Value: "From Vision to Software we Build it All!!!" },
   { Key: "HeroButtonPrimaryText", Value: "Start Your Project" },
   { Key: "HeroButtonPrimaryLink", Value: "/contact" },
   { Key: "HeroButtonSecondaryText", Value: "View Our Work" },
@@ -43,35 +43,35 @@ const news = [
 ];
 
 const jobs = [
-  { 
-    "Job Title": "Senior React Developer", 
-    Department: "Engineering", 
-    Location: "Mumbai (Hybrid)", 
+  {
+    "Job Title": "Senior React Developer",
+    Department: "Engineering",
+    Location: "Mumbai (Hybrid)",
     "Employment Type": "Full-Time",
-    "Experience Required": "3-5 Years", 
-    "Job Description": "We are looking for an experienced Senior React Developer to lead our enterprise web application development. You will be responsible for architecting scalable frontend solutions, mentoring junior developers, and collaborating closely with design and backend teams.", 
+    "Experience Required": "3-5 Years",
+    "Job Description": "We are looking for an experienced Senior React Developer to lead our enterprise web application development. You will be responsible for architecting scalable frontend solutions, mentoring junior developers, and collaborating closely with design and backend teams.",
     "Skills Required": "React, Next.js, TypeScript, Tailwind CSS, State Management (Redux/Zustand), Framer Motion",
     "Google Form URL": "https://forms.google.com/example-react-job",
     Status: "Open"
   },
-  { 
-    "Job Title": "AI/ML Engineer", 
-    Department: "Data Science", 
-    Location: "Remote", 
+  {
+    "Job Title": "AI/ML Engineer",
+    Department: "Data Science",
+    Location: "Remote",
     "Employment Type": "Full-Time",
-    "Experience Required": "2+ Years", 
-    "Job Description": "Join our AI team to build and deploy custom machine learning models for healthcare and enterprise clients. You will work on NLP, predictive analytics, and computer vision projects.", 
+    "Experience Required": "2+ Years",
+    "Job Description": "Join our AI team to build and deploy custom machine learning models for healthcare and enterprise clients. You will work on NLP, predictive analytics, and computer vision projects.",
     "Skills Required": "Python, TensorFlow, PyTorch, Scikit-Learn, Docker, FastApi",
     "Google Form URL": "https://forms.google.com/example-ai-job",
     Status: "Open"
   },
-  { 
-    "Job Title": "Cybersecurity Analyst", 
-    Department: "Security", 
-    Location: "Dubai", 
+  {
+    "Job Title": "Cybersecurity Analyst",
+    Department: "Security",
+    Location: "Dubai",
     "Employment Type": "Contract",
-    "Experience Required": "4+ Years", 
-    "Job Description": "Conduct extensive VAPT and source code reviews for enterprise applications to ensure maximum security compliance.", 
+    "Experience Required": "4+ Years",
+    "Job Description": "Conduct extensive VAPT and source code reviews for enterprise applications to ensure maximum security compliance.",
     "Skills Required": "VAPT, OWASP, Burp Suite, Network Security, Python",
     "Google Form URL": "https://forms.google.com/example-security-job",
     Status: "Closed"
