@@ -7,7 +7,7 @@ const Footer = () => {
   const location = useLocation();
   const config = useConfig();
   const isAdmin = location.pathname.startsWith('/admin');
-  
+
   if (isAdmin) return null;
 
   return (
@@ -17,16 +17,24 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-6 inline-block">
               {config.CompanyLogo ? (
-                <img src={config.CompanyLogo} alt={config.CompanyName} className="h-20 object-contain" />
+                <img
+                  src={config.CompanyLogo}
+                  alt={config.CompanyName}
+                  className="h-20 object-contain"
+                />
               ) : (
                 <div className="flex items-center gap-2">
                   <Globe className="w-8 h-8 text-brand-lighter" />
-                  <span className="text-2xl font-bold tracking-tighter">
+                  <span className="text-4xl font-bold tracking-tighter">
                     {config.CompanyName || 'TechInnoSphere'}
                   </span>
+
                 </div>
               )}
             </Link>
+            <p style={{ fontSize: 'x-large' }}>
+              {config.CompanyName || 'TechInnoSphere'}
+            </p>
             <p className="text-brand-lighter mb-8 max-w-sm leading-relaxed">
               {config.CompanyTagline || 'From Vision To Software We Build It All.'}
             </p>

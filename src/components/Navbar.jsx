@@ -44,13 +44,17 @@ const Navbar = () => {
               {config.CompanyName || 'TechInnoSphere'}
             </span>
           )}
+          <p style={{ fontSize: 'x-large' }}>
+            {config.CompanyName || 'TechInnoSphere'}
+          </p>
+
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6 lg:gap-8">
           {navLinks.map(link => (
-            <Link 
-              key={link.name} 
+            <Link
+              key={link.name}
               to={link.path}
               className={`text-sm font-medium transition-colors hover:text-brand-primary ${location.pathname === link.path ? 'text-brand-primary font-bold' : 'text-brand-dark'}`}
             >
@@ -90,45 +94,47 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Nav */}
-      {mobileMenuOpen && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-6 px-6 flex flex-col gap-6 h-screen overflow-y-auto pb-32 border-t border-gray-100"
-        >
-          <div className="flex flex-col gap-4">
-            {navLinks.map(link => (
-              <Link 
-                key={link.name} 
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-brand-darker font-bold text-lg hover:text-brand-primary"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-          
-          <div className="pt-6 border-t border-gray-100 flex gap-6 justify-center">
-            {config.InstagramURL && (
-              <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-pink-600">
-                <InstagramIcon className="w-6 h-6" />
-              </a>
-            )}
-            {config.FacebookURL && (
-              <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600">
-                <FacebookIcon className="w-6 h-6" />
-              </a>
-            )}
-            {config.WhatsAppNumber && (
-              <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-500">
-                <MessageCircle className="w-6 h-6" />
-              </a>
-            )}
-          </div>
-        </motion.div>
-      )}
-    </nav>
+      {
+        mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-6 px-6 flex flex-col gap-6 h-screen overflow-y-auto pb-32 border-t border-gray-100"
+          >
+            <div className="flex flex-col gap-4">
+              {navLinks.map(link => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-brand-darker font-bold text-lg hover:text-brand-primary"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-gray-100 flex gap-6 justify-center">
+              {config.InstagramURL && (
+                <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-pink-600">
+                  <InstagramIcon className="w-6 h-6" />
+                </a>
+              )}
+              {config.FacebookURL && (
+                <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600">
+                  <FacebookIcon className="w-6 h-6" />
+                </a>
+              )}
+              {config.WhatsAppNumber && (
+                <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-500">
+                  <MessageCircle className="w-6 h-6" />
+                </a>
+              )}
+            </div>
+          </motion.div>
+        )
+      }
+    </nav >
   );
 };
 
