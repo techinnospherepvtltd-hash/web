@@ -12,6 +12,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import News from './pages/News';
+import Testimonials from './pages/Testimonials';
 
 // Admin
 import AdminLayout from './admin/AdminLayout';
@@ -27,6 +28,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/services" element={<Services />} />
               <Route path="/work" element={<Work />} />
+              <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/careers" element={<Careers />} />

@@ -21,7 +21,7 @@ const EXPECTED_COLUMNS = {
   'news.xlsx': ['Title', 'Date', 'Category', 'Summary', 'Content', 'Image', 'Read Time', 'Author', 'Enabled'],
   'jobs.xlsx': ['Job Title', 'Department', 'Location', 'Employment Type', 'Experience Required', 'Job Description', 'Skills Required', 'Google Form URL', 'Status'],
   'clients.xlsx': ['Client Name', 'Country', 'Industry', 'Logo', 'Project Delivered', 'Latitude', 'Longitude'],
-  'testimonials.xlsx': ['Client Name', 'Company', 'Role', 'Comment', 'Rating', 'Avatar'],
+  'testimonials.xlsx': ['Client Name', 'Designation', 'Company', 'Location', 'Feedback', 'Rating', 'Client Photo', 'Related Project', 'Featured'],
   'config.xlsx': ['HeroHeading', 'HeroSubheading', 'HeroButtonPrimaryText', 'HeroButtonPrimaryLink', 'HeroButtonSecondaryText', 'HeroButtonSecondaryLink', 'CompanyLogo', 'Favicon', 'ContactEmail', 'ContactPhone', 'ContactAddress', 'MapLatitude', 'MapLongitude']
 };
 
@@ -44,6 +44,10 @@ const normalizeImportedData = (fileName, importedRows) => {
       } else {
         if (expectedKey === 'Enabled') {
           normalizedRow[expectedKey] = fileName === 'services.xlsx' ? 'Yes' : 'true';
+        } else if (expectedKey === 'Featured') {
+          normalizedRow[expectedKey] = 'No';
+        } else if (expectedKey === 'Rating') {
+          normalizedRow[expectedKey] = '5';
         } else if (expectedKey === 'Status') {
           normalizedRow[expectedKey] = 'Open';
         } else {
@@ -183,6 +187,12 @@ const Dashboard = ({ onLogout }) => {
     // Set default Enabled/featured value if it exists in columns
     if ('Enabled' in template) {
       template['Enabled'] = 'true';
+    }
+    if ('Featured' in template) {
+      template['Featured'] = 'No';
+    }
+    if ('Rating' in template) {
+      template['Rating'] = '5';
     }
     if ('Status' in template) {
       template['Status'] = 'Open';

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Code, Shield, Brain, Server, Monitor, Database, Cpu, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Code, Shield, Brain, Server, Monitor, Database, Cpu, ShieldCheck, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchExcelData } from '../utils/excelUtils';
+import { fetchExcelData, getDirectImageUrl } from '../utils/excelUtils';
 import { fetchConfig } from '../utils/configUtils';
 import ClientMap from '../components/ClientMap';
 
@@ -17,6 +17,26 @@ const Home = () => {
   const [services, setServices] = useState([]);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [config, setConfig] = useState(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    if (testimonials.length === 0) return;
+    const isTestimonialFeatured = (t) => {
+      if (t.Featured) {
+        const str = String(t.Featured).trim().toLowerCase();
+        return str === 'true' || str === 'yes' || str === 'y' || str === '1';
+      }
+      return Number(t.Rating) === 5;
+    };
+    const featured = testimonials.filter(isTestimonialFeatured).slice(0, 6);
+    if (featured.length === 0) return;
+
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % featured.length);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [testimonials]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -194,6 +214,97 @@ const Home = () => {
               View All Projects <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials Preview Section */}
+      <section className="py-32 bg-white border-t border-gray-100 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-50 z-0"></div>
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">What Our Clients Say</h2>
+              <p className="text-xl text-gray-500 font-medium">Trusted by fast-growing startups and established enterprises alike.</p>
+            </div>
+            <Link to="/testimonials" className="mt-6 md:mt-0 flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
+              View All Testimonials <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {(() => {
+            const isTestimonialFeatured = (t) => {
+              if (t.Featured) {
+                const str = String(t.Featured).trim().toLowerCase();
+                return str === 'true' || str === 'yes' || str === 'y' || str === '1';
+              }
+              return Number(t.Rating) === 5;
+            };
+            const featured = testimonials.filter(isTestimonialFeatured).slice(0, 6);
+            
+            if (featured.length === 0) return null;
+
+            return (
+              <div className="max-w-4xl mx-auto">
+                <div className="relative h-[420px] sm:h-[320px] md:h-[280px]">
+                  {featured.map((t, idx) => {
+                    const isCurrent = idx === activeSlide;
+                    const photoUrl = getDirectImageUrl(t['Client Photo']);
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={isCurrent ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className={`absolute inset-0 bg-[#FAFAFA] rounded-3xl p-8 md:p-12 border border-gray-100 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.01)] ${isCurrent ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-start mb-6">
+                            <Quote className="w-10 h-10 text-brand-primary/10" />
+                            <div className="flex gap-0.5 text-yellow-400">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${i < (Number(t.Rating) || 5) ? 'fill-current' : 'opacity-30'}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-gray-600 font-medium italic text-base md:text-lg leading-relaxed mb-6">
+                            "{t.Feedback || t.Comment || 'Exceptional partner for building digital platforms.'}"
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4 border-t border-gray-200/50 pt-4">
+                          {photoUrl ? (
+                            <img src={photoUrl} alt={t['Client Name']} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-dark/20 text-brand-dark flex items-center justify-center font-bold text-sm">
+                              {(t['Client Name'] || 'C').substring(0, 1).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <h4 className="font-extrabold text-brand-darker text-sm md:text-base leading-tight">{t['Client Name']}</h4>
+                            <p className="text-xs text-gray-500 font-bold leading-none mt-1">{t.Designation || t.Role || 'Director'} at <span className="text-brand-primary">{t.Company}</span></p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Track Indicators */}
+                <div className="flex justify-center gap-2 mt-8">
+                  {featured.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveSlide(idx)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === activeSlide ? 'bg-brand-primary w-8' : 'bg-gray-200 hover:bg-gray-300'}`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

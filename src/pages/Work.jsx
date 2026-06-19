@@ -1,22 +1,42 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchExcelData } from '../utils/excelUtils';
-import { ExternalLink, Calendar, MapPin, X, ChevronLeft, ChevronRight, Briefcase, Star, Target, Lightbulb, TrendingUp } from 'lucide-react';
+import { fetchExcelData, getDirectImageUrl } from '../utils/excelUtils';
+import { ExternalLink, Calendar, MapPin, X, ChevronLeft, ChevronRight, Briefcase, Star, Target, Lightbulb, TrendingUp, Quote } from 'lucide-react';
 
 const Work = () => {
   const [projects, setProjects] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
   const [filter, setFilter] = useState('All');
   const [categories, setCategories] = useState(['All']);
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(null);
 
   useEffect(() => {
-    const loadProjects = async () => {
+    const loadData = async () => {
       const data = await fetchExcelData('projects.xlsx');
       setProjects(data);
       const uniqueCategories = ['All', ...new Set(data.map(p => p.Category).filter(Boolean))];
       setCategories(uniqueCategories);
+
+      // Load testimonials
+      const testims = await fetchExcelData('testimonials.xlsx');
+      setTestimonials(testims);
+
+      // Check query param to auto-select project
+      const params = new URLSearchParams(window.location.search);
+      const projectTitle = params.get('project');
+      if (projectTitle) {
+        const idx = data.findIndex(p => p.Title.toLowerCase() === projectTitle.toLowerCase());
+        if (idx !== -1) {
+          setSelectedProjectIndex(idx);
+          // Set filter if the project is in a specific category
+          const proj = data[idx];
+          if (proj && proj.Category) {
+            setFilter('All'); // or keep All to make it simple
+          }
+        }
+      }
     };
-    loadProjects();
+    loadData();
   }, []);
 
   const filteredProjects = filter === 'All' ? projects : projects.filter(p => p.Category === filter);
@@ -248,30 +268,59 @@ const Work = () => {
                       </div>
                     </div>
 
-                    {/* Testimonial embedded */}
-                    {selectedProject.Testimonial && (
-                      <div className="pt-10 border-t border-gray-100">
-                        <div className="flex gap-4 items-start">
-                          <div className="text-brand-primary/20 text-6xl font-serif leading-none">"</div>
-                          <div>
-                            <p className="text-xl text-gray-700 italic mb-6 leading-relaxed">
-                              {selectedProject.Testimonial}
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h5 className="font-bold text-gray-900">{selectedProject['Client Name']}</h5>
-                                <p className="text-sm text-gray-500">{selectedProject['Client Designation']}</p>
-                              </div>
-                              {selectedProject['Client Rating'] && (
-                                <div className="flex gap-1 text-yellow-400">
-                                  {[...Array(Number(selectedProject['Client Rating']))].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                    {/* Related Testimonials Section */}
+                    {(() => {
+                      const relatedTestims = testimonials.filter(
+                        t => t['Related Project'] && 
+                             t['Related Project'].trim().toLowerCase() === selectedProject.Title.trim().toLowerCase()
+                      );
+                      if (relatedTestims.length === 0) return null;
+                      return (
+                        <div className="pt-10 border-t border-gray-100">
+                          <h4 className="text-xl font-bold text-brand-darker mb-6 flex items-center gap-2">
+                            <Quote className="w-5 h-5 text-brand-primary" /> Client Feedback
+                          </h4>
+                          <div className="space-y-6">
+                            {relatedTestims.map((t, i) => {
+                              const photoUrl = getDirectImageUrl(t['Client Photo']);
+                              return (
+                                <div key={i} className="bg-[#FAFAFA] rounded-3xl p-6 border border-gray-100 flex flex-col justify-between shadow-[0_4px_20px_rgb(0,0,0,0.01)]">
+                                  <div className="flex gap-0.5 text-yellow-400 mb-4">
+                                    {[...Array(5)].map((_, starIdx) => (
+                                      <Star
+                                        key={starIdx}
+                                        className={`w-4 h-4 ${starIdx < (Number(t.Rating) || 5) ? 'fill-current' : 'opacity-30'}`}
+                                      />
+                                    ))}
+                                  </div>
+                                  <p className="text-gray-600 font-medium italic text-base mb-6 leading-relaxed">
+                                    "{t.Feedback || t.Comment || 'Excellent work!'}"
+                                  </p>
+                                  <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                                    {photoUrl ? (
+                                      <img 
+                                        src={photoUrl} 
+                                        alt={t['Client Name']} 
+                                        className="w-10 h-10 rounded-full object-cover border border-gray-200" 
+                                      />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-dark/20 text-brand-dark flex items-center justify-center font-bold text-sm">
+                                        {(t['Client Name'] || 'C').substring(0, 1).toUpperCase()}
+                                      </div>
+                                    )}
+                                    <div>
+                                      <h5 className="font-extrabold text-brand-darker text-sm">{t['Client Name']}</h5>
+                                      <p className="text-[10px] text-gray-500 font-bold leading-none">{t.Designation || t.Role || 'Partner'}</p>
+                                      <p className="text-[10px] text-brand-primary font-extrabold leading-none mt-1">{t.Company} {t.Location ? `• ${t.Location}` : ''}</p>
+                                    </div>
+                                  </div>
                                 </div>
-                              )}
-                            </div>
+                              );
+                            })}
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Action */}
                     {selectedProject['Website URL'] && (
