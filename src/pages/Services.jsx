@@ -28,17 +28,17 @@ const Services = () => {
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0 pointer-events-none"></div>
-      
+
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="max-w-3xl mb-24 text-center mx-auto">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
           >
             Our Services
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -55,7 +55,7 @@ const Services = () => {
             const isEven = idx % 2 === 0;
 
             return (
-              <motion.div 
+              <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ const Services = () => {
                 <div className="w-full lg:w-1/2">
                   <div className="aspect-[4/3] rounded-3xl bg-gray-50 overflow-hidden relative border border-gray-100 shadow-inner flex items-center justify-center group">
                     {service['Banner Image'] ? (
-                      <img src={service['Banner Image']} alt={service['Service Name']} className="w-full h-full object-cover" />
+                      <img src={service['Banner Image']} alt={service['Service Name']} className="w-full h-full" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden">
                         <IconComponent className="w-32 h-32 text-gray-200 group-hover:scale-110 transition-transform duration-500" />
@@ -91,7 +91,7 @@ const Services = () => {
                       {service['Detailed Description']}
                     </p>
                   </div>
-                  
+
                   {features.length > 0 && (
                     <div className="space-y-3">
                       {features.map((feature, i) => (
@@ -104,11 +104,11 @@ const Services = () => {
                   )}
 
                   <div className="pt-4">
-                    <Link 
-                      to={service['CTA Link'] || "/contact"} 
+                    <Link
+                      to={service['CTA Link'] || "/contact"}
                       className="inline-flex items-center justify-center px-8 py-4 bg-[#111827] text-white rounded-xl font-bold hover:bg-brand-primary transition-all shadow-md hover:shadow-xl group"
                     >
-                      {service['CTA Text'] || "Learn More"} 
+                      {service['CTA Text'] || "Learn More"}
                       <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>
