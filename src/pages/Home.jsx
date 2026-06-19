@@ -28,18 +28,28 @@ const Home = () => {
       const testimsData = await fetchExcelData('testimonials.xlsx');
       const servicesData = await fetchExcelData('services.xlsx');
 
-      const isTrue = (val) => val === true || String(val).trim().toLowerCase() === 'true' || String(val).trim() === '1';
+      const isEnabled = (val) => {
+        if (val === undefined || val === null) return true;
+        const str = String(val).trim().toLowerCase();
+        return str !== 'false' && str !== 'no' && str !== 'n' && str !== '0';
+      };
+
+      const isFeatured = (val) => {
+        if (val === undefined || val === null) return false;
+        const str = String(val).trim().toLowerCase();
+        return str === 'true' || str === 'yes' || str === 'y' || str === '1';
+      };
 
       setStats({
         projects: projectsData.length,
         clients: clientsData.length,
-        services: servicesData.filter(s => isTrue(s.Enabled)).length,
+        services: servicesData.filter(s => isEnabled(s.Enabled)).length,
         countries: new Set(clientsData.map(c => c.Country)).size
       });
 
       setTestimonials(testimsData);
-      setServices(servicesData.filter(s => isTrue(s.Enabled)).slice(0, 4));
-      setFeaturedProjects(projectsData.filter(p => isTrue(p['Featured Project Toggle'])).slice(0, 3));
+      setServices(servicesData.filter(s => isEnabled(s.Enabled)).slice(0, 4));
+      setFeaturedProjects(projectsData.filter(p => isFeatured(p['Featured Project Toggle'])).slice(0, 3));
     };
     loadData();
   }, []);

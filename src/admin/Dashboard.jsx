@@ -43,7 +43,7 @@ const normalizeImportedData = (fileName, importedRows) => {
         normalizedRow[expectedKey] = row[match];
       } else {
         if (expectedKey === 'Enabled') {
-          normalizedRow[expectedKey] = 'true';
+          normalizedRow[expectedKey] = fileName === 'services.xlsx' ? 'Yes' : 'true';
         } else if (expectedKey === 'Status') {
           normalizedRow[expectedKey] = 'Open';
         } else {
@@ -252,6 +252,17 @@ const Dashboard = ({ onLogout }) => {
     }
   };
 
+  const handleResetToDefaults = () => {
+    if (window.confirm("Are you sure you want to discard all local admin edits and reset the data to the physical Excel files in the public/ folder?")) {
+      tabs.forEach(tab => {
+        if (tab.id !== 'dashboard') {
+          localStorage.removeItem(`techinnosphere_data_${tab.id}`);
+        }
+      });
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -332,6 +343,9 @@ const Dashboard = ({ onLogout }) => {
                 )}
                 <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all font-semibold text-sm shadow-sm">
                   <Download className="w-4 h-4" /> Export CSV
+                </button>
+                <button onClick={handleResetToDefaults} className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-100 rounded-lg hover:bg-red-50 transition-all font-semibold text-sm shadow-sm" title="Clear local browser edits and reload physical Excel files">
+                  <Trash2 className="w-4 h-4" /> Reset to Excel
                 </button>
                 <label className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-dark transition-all cursor-pointer font-semibold text-sm shadow-md">
                   <Upload className="w-4 h-4" /> Import Excel

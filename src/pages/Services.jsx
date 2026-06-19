@@ -14,7 +14,11 @@ const Services = () => {
   useEffect(() => {
     const loadServices = async () => {
       const data = await fetchExcelData('services.xlsx');
-      const isEnabled = (val) => val === true || String(val).trim().toLowerCase() === 'true' || String(val).trim() === '1';
+      const isEnabled = (val) => {
+        if (val === undefined || val === null) return true;
+        const str = String(val).trim().toLowerCase();
+        return str !== 'false' && str !== 'no' && str !== 'n' && str !== '0';
+      };
       setServices(data.filter(s => isEnabled(s.Enabled)));
     };
     loadServices();
