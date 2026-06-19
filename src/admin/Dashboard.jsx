@@ -15,6 +15,47 @@ const tabs = [
   { id: 'testimonials.xlsx', name: 'Testimonials', icon: Database }
 ];
 
+const EXPECTED_COLUMNS = {
+  'services.xlsx': ['Service Name', 'Short Description', 'Detailed Description', 'Icon', 'Banner Image', 'Category', 'Features List', 'Technologies Used', 'CTA Text', 'CTA Link', 'Enabled'],
+  'projects.xlsx': ['Title', 'Category', 'Description', 'Short Description', 'Image', 'Featured Project Toggle', 'Client Name', 'Role', 'URL', 'Enabled'],
+  'news.xlsx': ['Title', 'Date', 'Category', 'Summary', 'Content', 'Image', 'Read Time', 'Author', 'Enabled'],
+  'jobs.xlsx': ['Job Title', 'Department', 'Location', 'Employment Type', 'Experience Required', 'Job Description', 'Skills Required', 'Google Form URL', 'Status'],
+  'clients.xlsx': ['Client Name', 'Country', 'Industry', 'Logo', 'Project Delivered', 'Latitude', 'Longitude'],
+  'testimonials.xlsx': ['Client Name', 'Company', 'Role', 'Comment', 'Rating', 'Avatar'],
+  'config.xlsx': ['HeroHeading', 'HeroSubheading', 'HeroButtonPrimaryText', 'HeroButtonPrimaryLink', 'HeroButtonSecondaryText', 'HeroButtonSecondaryLink', 'CompanyLogo', 'Favicon', 'ContactEmail', 'ContactPhone', 'ContactAddress', 'MapLatitude', 'MapLongitude']
+};
+
+const normalizeImportedData = (fileName, importedRows) => {
+  const expected = EXPECTED_COLUMNS[fileName];
+  if (!expected || !importedRows || importedRows.length === 0) {
+    return importedRows;
+  }
+
+  const normalizeKey = (key) => String(key).toLowerCase().replace(/[\s_-]/g, '');
+
+  return importedRows.map(row => {
+    const normalizedRow = {};
+    const rowKeys = Object.keys(row);
+
+    expected.forEach(expectedKey => {
+      const match = rowKeys.find(rk => normalizeKey(rk) === normalizeKey(expectedKey));
+      if (match !== undefined) {
+        normalizedRow[expectedKey] = row[match];
+      } else {
+        if (expectedKey === 'Enabled') {
+          normalizedRow[expectedKey] = 'true';
+        } else if (expectedKey === 'Status') {
+          normalizedRow[expectedKey] = 'Open';
+        } else {
+          normalizedRow[expectedKey] = '';
+        }
+      }
+    });
+
+    return normalizedRow;
+  });
+};
+
 const Dashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
   const [data, setData] = useState([]);
@@ -86,11 +127,15 @@ const Dashboard = ({ onLogout }) => {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       const result = XLSX.utils.sheet_to_json(ws);
-      setData(result);
-      saveExcelDataLocal(activeTab, result);
-      if (activeTab === 'config.xlsx') {
-        window.location.reload(); // Reload to apply settings immediately
-      }
+      
+      // Normalize column keys to ensure they match expected casing/spacing
+      const normalizedResult = normalizeImportedData(activeTab, result);
+      
+      setData(normalizedResult);
+      saveExcelDataLocal(activeTab, normalizedResult);
+      
+      // Always reload the page to refresh all active contexts and components
+      window.location.reload();
     };
     reader.readAsBinaryString(file);
     e.target.value = null; // reset input
