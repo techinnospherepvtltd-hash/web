@@ -1,11 +1,42 @@
 import * as XLSX from 'xlsx';
 
+export const getDirectImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  
+  // Match standard file/d/ID/view pattern
+  const fileDMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileDMatch && fileDMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${fileDMatch[1]}`;
+  }
+  
+  // Match open?id=ID pattern
+  const idMatch = url.match(/[\?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+  }
+  
+  return url;
+};
+
+const resolveGoogleDriveLinks = (data) => {
+  if (!Array.isArray(data)) return data;
+  return data.map(row => {
+    const newRow = { ...row };
+    Object.keys(newRow).forEach(key => {
+      if (typeof newRow[key] === 'string' && newRow[key].includes('drive.google.com')) {
+        newRow[key] = getDirectImageUrl(newRow[key]);
+      }
+    });
+    return newRow;
+  });
+};
+
 export const fetchExcelData = async (fileName) => {
   try {
     // Check if data exists in localStorage (uploaded by Admin)
     const localData = localStorage.getItem(`techinnosphere_data_${fileName}`);
     if (localData) {
-      return JSON.parse(localData);
+      return resolveGoogleDriveLinks(JSON.parse(localData));
     }
 
     const response = await fetch(`${import.meta.env.BASE_URL}${fileName}`);
@@ -17,7 +48,7 @@ export const fetchExcelData = async (fileName) => {
     const firstSheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[firstSheetName];
     const json = XLSX.utils.sheet_to_json(worksheet);
-    return json;
+    return resolveGoogleDriveLinks(json);
   } catch (error) {
     console.error(`Error loading Excel file ${fileName}:`, error);
     return [];
