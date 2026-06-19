@@ -20,8 +20,8 @@ const services = [
 
 const config = [
   { Key: "CompanyName", Value: "TechInnoSphere" },
-  { Key: "CompanyLogo", Value: "" },
-  { Key: "Favicon", Value: "" },
+  { Key: "CompanyLogo", Value: "logo.png" },
+  { Key: "Favicon", Value: "logo.png" },
   { Key: "WhatsAppNumber", Value: "+917710031550" },
   { Key: "InstagramURL", Value: "https://www.instagram.com/techinnosphere/" },
   { Key: "FacebookURL", Value: "https://www.facebook.com/profile.php?id=61584937588072" },

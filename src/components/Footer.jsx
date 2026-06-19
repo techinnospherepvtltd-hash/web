@@ -17,7 +17,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-6 inline-block">
               {config.CompanyLogo ? (
-                <img src={config.CompanyLogo} alt={config.CompanyName} className="h-12 object-contain filter brightness-0 invert" />
+                <img src={config.CompanyLogo} alt={config.CompanyName} className="h-12 object-contain" />
               ) : (
                 <div className="flex items-center gap-2">
                   <Globe className="w-8 h-8 text-brand-lighter" />
