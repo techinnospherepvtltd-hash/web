@@ -33,7 +33,7 @@ const Navbar = () => {
   if (isAdmin) return null;
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'glass-panel shadow-sm py-4' : 'bg-transparent py-6'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled || mobileMenuOpen ? 'bg-white border-b border-gray-100 shadow-sm py-4' : 'bg-transparent py-6'}`}>
       <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 z-50">
           {config.CompanyLogo ? (
@@ -91,9 +91,9 @@ const Navbar = () => {
       {/* Mobile Nav */}
       {mobileMenuOpen && (
         <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="md:hidden absolute top-full left-0 w-full glass-panel shadow-lg py-6 px-6 flex flex-col gap-6 h-screen overflow-y-auto pb-32"
+          className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-6 px-6 flex flex-col gap-6 h-screen overflow-y-auto pb-32 border-t border-gray-100"
         >
           <div className="flex flex-col gap-4">
             {navLinks.map(link => (
