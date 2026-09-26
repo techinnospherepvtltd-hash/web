@@ -6,7 +6,7 @@ import { useConfig } from '../context/ConfigContext';
 const Footer = () => {
   const location = useLocation();
   const config = useConfig();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdmin = location.pathname.startsWith('/admin') || location.pathname.startsWith('/dashboard');
 
   if (isAdmin) return null;
 

@@ -15,8 +15,8 @@ const IconMap = {
 };
 
 const DEFAULT_CONFIG = {
-  HeroHeading: 'Software Development & AI Solutions for Modern Enterprises',
-  HeroSubheading: 'TechInnoSphere architects and engineers high-performance web applications, mobile platforms, custom software, and artificial intelligence solutions for businesses across India and global markets.',
+  HeroHeading: 'TechInnoSphere – Software Development & AI Solutions Company',
+  HeroSubheading: 'TechInnoSphere Software Solutions Pvt. Ltd. is a Mumbai-based technology company delivering web and application development, custom software, AI solutions, SAP ABAP, automation and digital transformation services for businesses in India and global markets.',
   HeroButtonPrimaryText: 'Start Your Project',
   HeroButtonPrimaryLink: '/contact',
   HeroButtonSecondaryText: 'Explore Our Work',
@@ -102,35 +102,41 @@ const Home = () => {
     <div className="bg-white">
       <SEO
         title="TechInnoSphere | Software Development & AI Solutions Company"
-        description="TechInnoSphere is a software development and technology company offering web and app development, AI solutions, custom software, SAP ABAP, automation, and digital services from Mumbai, India."
+        description="TechInnoSphere Software Solutions Pvt. Ltd. is a software development and technology company based in Mumbai, India, offering web and application development, AI solutions, custom software, SAP ABAP, automation, and digital transformation services."
         canonical="https://techinnosphere.com/"
         structuredData={structuredData}
       />
 
-      {/* Hero Section */}
+      {/* 1. Hero Section: Primary H1 & Company Introduction */}
       <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-[#FAFAFA]">
         <div className="absolute inset-0 bg-gradient-to-b from-[#F0F2F5] to-transparent z-0 opacity-50"></div>
-        {/* Subtle grid pattern background characteristic of Linear/Vercel */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0"></div>
 
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+        <div className="container mx-auto px-6 lg:px-12 relative z-10 py-16">
           <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-lightest text-brand-primary text-sm font-bold mb-6 border border-brand-primary/10">
+              <span className="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
+              Software Development Company in Mumbai
+            </div>
+
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-8 leading-[1.1] text-[#111827]"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-8 leading-[1.15] text-[#111827]"
             >
-              {config.HeroHeading}
+              TechInnoSphere – Software Development &amp; AI Solutions Company
             </motion.h1>
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-xl md:text-2xl text-gray-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
+              className="text-lg md:text-xl text-gray-600 mb-10 max-w-4xl mx-auto leading-relaxed font-normal"
             >
-              {config.HeroSubheading}
+              TechInnoSphere Software Solutions Pvt. Ltd. is a Mumbai-based technology company delivering web and application development, custom software, AI solutions, SAP ABAP, automation and digital transformation services for businesses in India and global markets.
             </motion.p>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -154,15 +160,18 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Dynamic Services Preview */}
-      <section className="py-32 bg-[#FAFAFA]">
+      {/* 2. Core Services Section */}
+      <section className="py-28 bg-[#FAFAFA] border-t border-gray-100">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="max-w-3xl mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
-              Enterprise-Grade Technology Solutions
+          <div className="max-w-3xl mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-4">
+              Our Software Development Services
             </h2>
-            <p className="text-xl text-gray-500">
-              We design, build, and deploy robust, scalable, and secure digital applications tailored to your business needs.
+            <p className="text-xl text-brand-primary font-bold mb-4">
+              Enterprise Software Development &amp; AI Solutions
+            </p>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              As a full-service software development company in Mumbai, we architect, engineer, and deploy high-performance web development platforms, mobile application development, custom software systems, enterprise AI solutions, SAP ABAP integrations, and business automation workflows that drive measurable digital transformation.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -193,7 +202,7 @@ const Home = () => {
           <div className="mt-12 text-center">
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 text-brand-primary font-bold hover:text-brand-dark transition-colors"
+              className="inline-flex items-center gap-2 text-brand-primary font-bold hover:text-brand-dark transition-colors text-base"
             >
               Explore our software development services <ArrowRight className="w-4 h-4" />
             </Link>
@@ -201,16 +210,16 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Projects Preview */}
-      <section className="py-32 bg-white border-t border-gray-100">
+      {/* 3. Featured Projects & Case Studies */}
+      <section className="py-28 bg-white border-t border-gray-100">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="flex justify-between items-end mb-20">
+          <div className="flex justify-between items-end mb-16">
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-4">
                 Featured Projects &amp; Case Studies
               </h2>
-              <p className="text-xl text-gray-500">
-                A selection of high-impact enterprise software, web, mobile, and AI solutions engineered for global organizations.
+              <p className="text-lg text-gray-600 leading-relaxed">
+                A selection of high-impact custom software development, web development, mobile applications, and AI development systems engineered for global organizations.
               </p>
             </div>
             <Link
@@ -234,7 +243,7 @@ const Home = () => {
                   {project.Image ? (
                     <img
                       src={project.Image}
-                      alt={`TechInnoSphere project for ${project.Title} - ${project.Category}`}
+                      alt={`TechInnoSphere software project: ${project.Title} - ${project.Category}`}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -262,17 +271,17 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials Preview Section */}
-      <section className="py-32 bg-white border-t border-gray-100 overflow-hidden relative">
+      {/* 4. Testimonials Section */}
+      <section className="py-28 bg-white border-t border-gray-100 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-50 z-0"></div>
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-4">
                 What Our Clients Say
               </h2>
-              <p className="text-xl text-gray-500 font-medium">
-                Trusted by fast-growing startups and established enterprises across the globe.
+              <p className="text-lg text-gray-600 font-medium">
+                Read feedback from enterprise leaders who partner with our software development company for digital transformation.
               </p>
             </div>
             <Link to="/testimonials" className="mt-6 md:mt-0 flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
@@ -326,7 +335,7 @@ const Home = () => {
                           {photoUrl ? (
                             <img
                               src={photoUrl}
-                              alt={`${t['Client Name']} testimonial for TechInnoSphere`}
+                              alt={`${t['Client Name']}, ${t.Designation || 'Client'} at ${t.Company} - Client review for TechInnoSphere`}
                               loading="lazy"
                               className="w-12 h-12 rounded-full object-cover border border-gray-200"
                             />
@@ -362,16 +371,16 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Global Presence Map Section */}
-      <section className="py-32 bg-[#FAFAFA] border-t border-gray-100">
+      {/* 5. Global Presence Map Section */}
+      <section className="py-28 bg-[#FAFAFA] border-t border-gray-100">
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="w-full lg:w-1/3">
               <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
                 Global Technology Partnerships
               </h2>
-              <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-                Headquartered in Mumbai, India, TechInnoSphere delivers digital solutions to enterprises across India, Dubai, Canada, Austria, and worldwide. We provide seamless communication, transparent project management, and reliable delivery across time zones.
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                Headquartered as a premier software development company in Mumbai, India, TechInnoSphere delivers digital transformation, custom software, AI solutions, and technology consulting across India, United Arab Emirates, Canada, Austria, and worldwide. We provide seamless communication, transparent project management, and reliable delivery across time zones.
               </p>
             </div>
             <div className="w-full lg:w-2/3">
@@ -381,16 +390,16 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 bg-brand-darker text-white text-center relative overflow-hidden">
+      {/* 6. CTA Section: Contact TechInnoSphere */}
+      <section className="py-28 bg-brand-darker text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-brand-primary/20 mix-blend-multiply"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-20"></div>
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <h2 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-            Ready to Build Your Software System?
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
+            Contact TechInnoSphere
           </h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-medium">
-            Join leading businesses worldwide who trust TechInnoSphere to engineer their web applications, mobile platforms, and AI systems.
+          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-medium">
+            Ready to build your custom software system, web application, mobile app, or AI solution? Get in touch with our engineering team in Mumbai, India.
           </p>
           <Link
             to="/contact"

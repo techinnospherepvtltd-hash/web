@@ -30,7 +30,7 @@ const Navbar = () => {
     { name: 'Contact', path: '/contact' }
   ];
 
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdmin = location.pathname.startsWith('/admin') || location.pathname.startsWith('/dashboard');
   if (isAdmin) return null;
 
   return (

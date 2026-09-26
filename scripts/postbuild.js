@@ -23,7 +23,7 @@ const routes = [
   {
     path: 'about',
     title: 'About TechInnoSphere | Software & Technology Solutions Company',
-    description: 'Learn about TechInnoSphere Software Solutions Pvt. Ltd., a Mumbai-based technology company delivering software development, AI, automation and digital solutions for businesses.',
+    description: 'Learn about TechInnoSphere Software Solutions Pvt. Ltd., a Mumbai-based technology company delivering software development, AI, automation, and digital solutions for businesses.',
     canonical: 'https://techinnosphere.com/about'
   },
   {
@@ -66,19 +66,22 @@ const routes = [
     path: 'admin',
     title: 'Admin Portal | TechInnoSphere',
     description: 'TechInnoSphere Administrator Portal',
-    canonical: 'https://techinnosphere.com/admin'
+    canonical: 'https://techinnosphere.com/admin',
+    noindex: true
   },
   {
     path: 'admin/dashboard',
     title: 'Admin Dashboard | TechInnoSphere',
     description: 'TechInnoSphere Admin Dashboard',
-    canonical: 'https://techinnosphere.com/admin/dashboard'
+    canonical: 'https://techinnosphere.com/admin/dashboard',
+    noindex: true
   },
   {
     path: 'dashboard',
     title: 'Dashboard | TechInnoSphere',
     description: 'TechInnoSphere Dashboard',
-    canonical: 'https://techinnosphere.com/dashboard'
+    canonical: 'https://techinnosphere.com/dashboard',
+    noindex: true
   }
 ];
 
@@ -100,6 +103,19 @@ function customizeHtml(baseHtml, route) {
     /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i,
     `<link rel="canonical" href="${route.canonical}" />`
   );
+
+  // Indexing Controls (noindex for admin routes)
+  if (route.noindex) {
+    html = html.replace(
+      /<meta\s+name="robots"\s+content=".*?"\s*\/?>/i,
+      '<meta name="robots" content="noindex, nofollow" />'
+    );
+  } else {
+    html = html.replace(
+      /<meta\s+name="robots"\s+content=".*?"\s*\/?>/i,
+      '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />'
+    );
+  }
 
   // Open Graph
   html = html.replace(
@@ -144,12 +160,10 @@ routes.forEach((route) => {
 const robotsPath = path.join(distDir, 'robots.txt');
 const sitemapPath = path.join(distDir, 'sitemap.xml');
 
-if (!fs.existsSync(robotsPath)) {
-  console.warn('Warning: dist/robots.txt not found! Copying from public/robots.txt...');
+if (!fs.existsSync(robotsPath) || true) {
   fs.copyFileSync(path.resolve('public/robots.txt'), robotsPath);
 }
-if (!fs.existsSync(sitemapPath)) {
-  console.warn('Warning: dist/sitemap.xml not found! Copying from public/sitemap.xml...');
+if (!fs.existsSync(sitemapPath) || true) {
   fs.copyFileSync(path.resolve('public/sitemap.xml'), sitemapPath);
 }
 

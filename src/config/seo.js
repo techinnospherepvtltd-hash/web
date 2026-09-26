@@ -10,7 +10,7 @@ export const SEO_CONFIG = {
   defaultTitle: 'TechInnoSphere | Software Development & AI Solutions Company',
   titleTemplate: '%s | TechInnoSphere',
   defaultDescription:
-    'TechInnoSphere Software Solutions Pvt. Ltd. is a premier software development and technology company based in Mumbai, India, delivering web and mobile applications, custom software, AI solutions, SAP ABAP, business automation, and digital services globally.',
+    'TechInnoSphere Software Solutions Pvt. Ltd. is a software development and technology company based in Mumbai, India, offering web and application development, AI solutions, custom software, SAP ABAP, automation, and digital transformation services.',
   defaultImage: 'https://techinnosphere.com/logo.png',
   locale: 'en_US',
   themeColor: '#143481',
