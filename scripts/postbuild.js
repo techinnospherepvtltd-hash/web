@@ -61,6 +61,24 @@ const routes = [
     title: 'Contact TechInnoSphere | Software Development Company in Mumbai',
     description: 'Contact TechInnoSphere Software Solutions Pvt. Ltd. in Mumbai, India for software development, AI solutions, web & mobile applications, and technology consulting.',
     canonical: 'https://techinnosphere.com/contact'
+  },
+  {
+    path: 'admin',
+    title: 'Admin Portal | TechInnoSphere',
+    description: 'TechInnoSphere Administrator Portal',
+    canonical: 'https://techinnosphere.com/admin'
+  },
+  {
+    path: 'admin/dashboard',
+    title: 'Admin Dashboard | TechInnoSphere',
+    description: 'TechInnoSphere Admin Dashboard',
+    canonical: 'https://techinnosphere.com/admin/dashboard'
+  },
+  {
+    path: 'dashboard',
+    title: 'Dashboard | TechInnoSphere',
+    description: 'TechInnoSphere Dashboard',
+    canonical: 'https://techinnosphere.com/dashboard'
   }
 ];
 

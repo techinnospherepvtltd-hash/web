@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
@@ -39,6 +39,8 @@ function App() {
               
               {/* Admin Routes */}
               <Route path="/admin/*" element={<AdminLayout />} />
+              <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="/dashboard/*" element={<Navigate to="/admin/dashboard" replace />} />
 
               {/* Catch-all 404 Route */}
               <Route path="*" element={<NotFound />} />

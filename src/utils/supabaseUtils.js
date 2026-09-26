@@ -1,8 +1,54 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { fetchExcelData, saveExcelDataLocal, getDirectImageUrl } from './excelUtils';
 
-// Helper to handle boolean string or raw boolean
-const parseBool = (val, defaultVal = true) => {
+// ---------------------------------------------------------
+// Validation & Sanitization Helpers
+// ---------------------------------------------------------
+
+export const isValidUUID = (id) => {
+  return typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+};
+
+export const sanitizeDate = (val) => {
+  if (val === undefined || val === null || val === '') return null;
+  // Handle Excel date serial numbers
+  if (typeof val === 'number') {
+    const date = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
+  }
+  const str = String(val).trim();
+  if (!str || str.toLowerCase() === 'n/a' || str.toLowerCase() === 'ongoing' || str.toLowerCase() === 'null') {
+    return null;
+  }
+  // Try YYYY-MM-DD directly
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return str;
+  }
+  // Try DD/MM/YYYY or DD-MM-YYYY
+  const dmyMatch = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, '0');
+    const month = dmyMatch[2].padStart(2, '0');
+    const year = dmyMatch[3];
+    return `${year}-${month}-${day}`;
+  }
+  const parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed.toISOString().split('T')[0];
+};
+
+export const sanitizeInt = (val, defaultVal = null) => {
+  if (val === undefined || val === null || val === '') return defaultVal;
+  const num = parseInt(val, 10);
+  return isNaN(num) ? defaultVal : num;
+};
+
+export const sanitizeFloat = (val, defaultVal = null) => {
+  if (val === undefined || val === null || val === '') return defaultVal;
+  const num = parseFloat(val);
+  return isNaN(num) ? defaultVal : num;
+};
+
+export const sanitizeBool = (val, defaultVal = true) => {
   if (val === undefined || val === null || val === '') return defaultVal;
   if (typeof val === 'boolean') return val;
   const str = String(val).trim().toLowerCase();
@@ -12,6 +58,7 @@ const parseBool = (val, defaultVal = true) => {
 // ---------------------------------------------------------
 // Transformation functions: DB snake_case -> App Casing
 // ---------------------------------------------------------
+
 export const mapClientFromDB = (row) => ({
   id: row.id,
   'Client Name': row.client_name || '',
@@ -25,17 +72,23 @@ export const mapClientFromDB = (row) => ({
   'Project Count': row.project_count !== null ? Number(row.project_count) : 1
 });
 
-export const mapClientToDB = (item) => ({
-  client_name: item['Client Name'] || item.client_name || '',
-  country: item.Country || item.country || '',
-  city: item.City || item.city || '',
-  industry: item.Industry || item.industry || '',
-  logo: item.Logo || item.logo || '',
-  project_delivered: item['Project Delivered'] || item.project_delivered || '',
-  latitude: item.Latitude !== undefined && item.Latitude !== '' ? Number(item.Latitude) : null,
-  longitude: item.Longitude !== undefined && item.Longitude !== '' ? Number(item.Longitude) : null,
-  project_count: item['Project Count'] !== undefined && item['Project Count'] !== '' ? Number(item['Project Count']) : 1
-});
+export const mapClientToDB = (item) => {
+  const dbRecord = {
+    client_name: String(item['Client Name'] || item.client_name || '').trim(),
+    country: String(item.Country || item.country || '').trim(),
+    city: String(item.City || item.city || '').trim(),
+    industry: String(item.Industry || item.industry || '').trim(),
+    logo: String(item.Logo || item.logo || '').trim(),
+    project_delivered: String(item['Project Delivered'] || item.project_delivered || '').trim(),
+    latitude: sanitizeFloat(item.Latitude ?? item.latitude, null),
+    longitude: sanitizeFloat(item.Longitude ?? item.longitude, null),
+    project_count: sanitizeInt(item['Project Count'] ?? item.project_count, 1)
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
 
 export const mapConfigFromDB = (rows) => {
   const cfg = {};
@@ -47,6 +100,26 @@ export const mapConfigFromDB = (rows) => {
     });
   }
   return cfg;
+};
+
+export const mapConfigListFromDB = (rows) => {
+  if (!Array.isArray(rows)) return [];
+  return rows.map(r => ({
+    id: r.id,
+    Key: r.key || '',
+    Value: r.value || ''
+  }));
+};
+
+export const mapConfigToDB = (item) => {
+  const dbRecord = {
+    key: String(item.Key || item.key || '').trim(),
+    value: String(item.Value ?? item.value ?? '').trim()
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
 };
 
 export const mapConfigToDBList = (cfgObj) => {
@@ -69,17 +142,23 @@ export const mapJobFromDB = (row) => ({
   Status: row.status || 'Open'
 });
 
-export const mapJobToDB = (item) => ({
-  job_title: item['Job Title'] || item.job_title || '',
-  department: item.Department || item.department || '',
-  location: item.Location || item.location || '',
-  employment_type: item['Employment Type'] || item.employment_type || '',
-  experience_required: item['Experience Required'] || item.experience_required || '',
-  job_description: item['Job Description'] || item.job_description || '',
-  skills_required: item['Skills Required'] || item.skills_required || '',
-  google_form_url: item['Google Form URL'] || item.google_form_url || '',
-  status: item.Status || item.status || 'Open'
-});
+export const mapJobToDB = (item) => {
+  const dbRecord = {
+    job_title: String(item['Job Title'] || item.job_title || '').trim(),
+    department: String(item.Department || item.department || '').trim(),
+    location: String(item.Location || item.location || '').trim(),
+    employment_type: String(item['Employment Type'] || item.employment_type || '').trim(),
+    experience_required: String(item['Experience Required'] || item.experience_required || '').trim(),
+    job_description: String(item['Job Description'] || item.job_description || '').trim(),
+    skills_required: String(item['Skills Required'] || item.skills_required || '').trim(),
+    google_form_url: String(item['Google Form URL'] || item.google_form_url || '').trim(),
+    status: String(item.Status || item.status || 'Open').trim()
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
 
 export const mapNewsFromDB = (row) => ({
   id: row.id,
@@ -94,17 +173,23 @@ export const mapNewsFromDB = (row) => ({
   Enabled: row.enabled ? 'Yes' : 'No'
 });
 
-export const mapNewsToDB = (item) => ({
-  title: item.Title || item.title || '',
-  description: item.Description || item.description || '',
-  content: item.Content || item.content || '',
-  image: item.Image || item.image || '',
-  publish_date: item['Publish Date'] || item.publish_date || null,
-  category: item.Category || item.category || '',
-  read_time: item['Read Time'] || item.read_time || '',
-  author: item.Author || item.author || '',
-  enabled: parseBool(item.Enabled, true)
-});
+export const mapNewsToDB = (item) => {
+  const dbRecord = {
+    title: String(item.Title || item.title || '').trim(),
+    description: String(item.Description || item.description || item.Summary || '').trim(),
+    content: String(item.Content || item.content || '').trim(),
+    image: String(item.Image || item.image || '').trim(),
+    publish_date: sanitizeDate(item['Publish Date'] ?? item.publish_date ?? item.Date),
+    category: String(item.Category || item.category || '').trim(),
+    read_time: String(item['Read Time'] || item.read_time || '').trim(),
+    author: String(item.Author || item.author || '').trim(),
+    enabled: sanitizeBool(item.Enabled ?? item.enabled, true)
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
 
 export const mapProjectFromDB = (row) => ({
   id: row.id,
@@ -133,29 +218,35 @@ export const mapProjectFromDB = (row) => ({
   Enabled: row.enabled ? 'Yes' : 'No'
 });
 
-export const mapProjectToDB = (item) => ({
-  title: item.Title || item.title || '',
-  category: item.Category || item.category || '',
-  description: item.Description || item.description || '',
-  short_description: item['Short Description'] || item.short_description || '',
-  full_case_study_description: item['Full Case Study Description'] || item.full_case_study_description || '',
-  client_name: item['Client Name'] || item.client_name || '',
-  role: item.Role || item.role || '',
-  location: item.Location || item.location || '',
-  image: item.Image || item.image || '',
-  website_url: item['Website URL'] || item.URL || item.website_url || '',
-  technology_used: item['Technology Used'] || item.technology_used || '',
-  industry: item.Industry || item.industry || '',
-  completion_date: item['Completion Date'] || item.completion_date || null,
-  challenges: item.Challenges || item.challenges || '',
-  solution_provided: item['Solution Provided'] || item.solution_provided || '',
-  business_outcome: item['Business Outcome'] || item.business_outcome || '',
-  testimonial: item.Testimonial || item.testimonial || '',
-  client_designation: item['Client Designation'] || item.client_designation || '',
-  client_rating: item['Client Rating'] !== undefined && item['Client Rating'] !== '' ? Number(item['Client Rating']) : 5,
-  featured: parseBool(item['Featured Project Toggle'] ?? item.Featured, false),
-  enabled: parseBool(item.Enabled, true)
-});
+export const mapProjectToDB = (item) => {
+  const dbRecord = {
+    title: String(item.Title || item.title || '').trim(),
+    category: String(item.Category || item.category || '').trim(),
+    description: String(item.Description || item.description || '').trim(),
+    short_description: String(item['Short Description'] || item.short_description || '').trim(),
+    full_case_study_description: String(item['Full Case Study Description'] || item.full_case_study_description || '').trim(),
+    client_name: String(item['Client Name'] || item.client_name || '').trim(),
+    role: String(item.Role || item.role || '').trim(),
+    location: String(item.Location || item.location || '').trim(),
+    image: String(item.Image || item.image || '').trim(),
+    website_url: String(item['Website URL'] || item.URL || item.website_url || '').trim(),
+    technology_used: String(item['Technology Used'] || item.technology_used || '').trim(),
+    industry: String(item.Industry || item.industry || '').trim(),
+    completion_date: sanitizeDate(item['Completion Date'] ?? item.completion_date),
+    challenges: String(item.Challenges || item.challenges || '').trim(),
+    solution_provided: String(item['Solution Provided'] || item.solution_provided || '').trim(),
+    business_outcome: String(item['Business Outcome'] || item.business_outcome || '').trim(),
+    testimonial: String(item.Testimonial || item.testimonial || '').trim(),
+    client_designation: String(item['Client Designation'] || item.client_designation || '').trim(),
+    client_rating: sanitizeInt(item['Client Rating'] ?? item.client_rating, 5),
+    featured: sanitizeBool(item['Featured Project Toggle'] ?? item.Featured ?? item.featured, false),
+    enabled: sanitizeBool(item.Enabled ?? item.enabled, true)
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
 
 export const mapServiceFromDB = (row) => ({
   id: row.id,
@@ -172,19 +263,25 @@ export const mapServiceFromDB = (row) => ({
   Enabled: row.enabled ? 'Yes' : 'No'
 });
 
-export const mapServiceToDB = (item) => ({
-  service_name: item['Service Name'] || item.service_name || '',
-  short_description: item['Short Description'] || item.short_description || '',
-  detailed_description: item['Detailed Description'] || item.detailed_description || '',
-  icon: item.Icon || item.icon || '',
-  banner_image: item['Banner Image'] || item.banner_image || '',
-  category: item.Category || item.category || '',
-  features_list: item['Features List'] || item.features_list || '',
-  technologies_used: item['Technologies Used'] || item.technologies_used || '',
-  cta_text: item['CTA Text'] || item.cta_text || '',
-  cta_link: item['CTA Link'] || item.cta_link || '',
-  enabled: parseBool(item.Enabled, true)
-});
+export const mapServiceToDB = (item) => {
+  const dbRecord = {
+    service_name: String(item['Service Name'] || item.service_name || '').trim(),
+    short_description: String(item['Short Description'] || item.short_description || '').trim(),
+    detailed_description: String(item['Detailed Description'] || item.detailed_description || '').trim(),
+    icon: String(item.Icon || item.icon || '').trim(),
+    banner_image: String(item['Banner Image'] || item.banner_image || '').trim(),
+    category: String(item.Category || item.category || '').trim(),
+    features_list: String(item['Features List'] || item.features_list || '').trim(),
+    technologies_used: String(item['Technologies Used'] || item.technologies_used || '').trim(),
+    cta_text: String(item['CTA Text'] || item.cta_text || '').trim(),
+    cta_link: String(item['CTA Link'] || item.cta_link || '').trim(),
+    enabled: sanitizeBool(item.Enabled ?? item.enabled, true)
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
 
 export const mapTestimonialFromDB = (row) => ({
   id: row.id,
@@ -199,21 +296,106 @@ export const mapTestimonialFromDB = (row) => ({
   Featured: row.featured ? 'Yes' : 'No'
 });
 
-export const mapTestimonialToDB = (item) => ({
-  client_name: item['Client Name'] || item.client_name || '',
-  designation: item.Designation || item.designation || '',
-  company: item.Company || item.company || '',
-  location: item.Location || item.location || '',
-  feedback: item.Feedback || item.feedback || '',
-  rating: item.Rating !== undefined && item.Rating !== '' ? Number(item.Rating) : 5,
-  client_photo: item['Client Photo'] || item.client_photo || '',
-  related_project: item['Related Project'] || item.related_project || '',
-  featured: parseBool(item.Featured, false)
-});
+export const mapTestimonialToDB = (item) => {
+  const dbRecord = {
+    client_name: String(item['Client Name'] || item.client_name || '').trim(),
+    designation: String(item.Designation || item.designation || '').trim(),
+    company: String(item.Company || item.company || '').trim(),
+    location: String(item.Location || item.location || '').trim(),
+    feedback: String(item.Feedback || item.feedback || '').trim(),
+    rating: sanitizeInt(item.Rating ?? item.rating, 5),
+    client_photo: String(item['Client Photo'] || item.client_photo || '').trim(),
+    related_project: String(item['Related Project'] || item.related_project || '').trim(),
+    featured: sanitizeBool(item.Featured ?? item.featured, false)
+  };
+  if (isValidUUID(item.id)) {
+    dbRecord.id = item.id;
+  }
+  return dbRecord;
+};
+
+// Table configuration mappings
+export const getTableConfig = (fileName) => {
+  switch (fileName) {
+    case 'clients.xlsx':
+      return {
+        table: 'clients',
+        toDB: mapClientToDB,
+        fromDB: mapClientFromDB,
+        uniqueField: 'client_name',
+        appUniqueField: 'Client Name',
+        orderBy: 'created_at',
+        ascending: true
+      };
+    case 'config.xlsx':
+      return {
+        table: 'config',
+        toDB: mapConfigToDB,
+        fromDB: (r) => ({ id: r.id, Key: r.key || '', Value: r.value || '' }),
+        uniqueField: 'key',
+        appUniqueField: 'Key',
+        orderBy: 'key',
+        ascending: true
+      };
+    case 'jobs.xlsx':
+      return {
+        table: 'jobs',
+        toDB: mapJobToDB,
+        fromDB: mapJobFromDB,
+        uniqueField: 'job_title',
+        appUniqueField: 'Job Title',
+        orderBy: 'created_at',
+        ascending: true
+      };
+    case 'news.xlsx':
+      return {
+        table: 'news',
+        toDB: mapNewsToDB,
+        fromDB: mapNewsFromDB,
+        uniqueField: 'title',
+        appUniqueField: 'Title',
+        orderBy: 'created_at',
+        ascending: false
+      };
+    case 'projects.xlsx':
+      return {
+        table: 'projects',
+        toDB: mapProjectToDB,
+        fromDB: mapProjectFromDB,
+        uniqueField: 'title',
+        appUniqueField: 'Title',
+        orderBy: 'created_at',
+        ascending: true
+      };
+    case 'services.xlsx':
+      return {
+        table: 'services',
+        toDB: mapServiceToDB,
+        fromDB: mapServiceFromDB,
+        uniqueField: 'service_name',
+        appUniqueField: 'Service Name',
+        orderBy: 'created_at',
+        ascending: true
+      };
+    case 'testimonials.xlsx':
+      return {
+        table: 'testimonials',
+        toDB: mapTestimonialToDB,
+        fromDB: mapTestimonialFromDB,
+        uniqueField: 'client_name',
+        appUniqueField: 'Client Name',
+        orderBy: 'created_at',
+        ascending: true
+      };
+    default:
+      return null;
+  }
+};
 
 // ---------------------------------------------------------
 // Primary Fetchers with Graceful Fallback
 // ---------------------------------------------------------
+
 export const getClients = async () => {
   if (isSupabaseConfigured()) {
     try {
@@ -247,6 +429,25 @@ export const getConfig = async () => {
     }
   });
   return cfg;
+};
+
+export const getConfigList = async () => {
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase.from('config').select('*').order('key', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return mapConfigListFromDB(data);
+      }
+    } catch (e) {
+      console.warn('Supabase config list fetch failed, using local fallback:', e);
+    }
+  }
+  const excelData = await fetchExcelData('config.xlsx');
+  return excelData.map(item => ({
+    id: item.id || '',
+    Key: item.Key || item.key || '',
+    Value: item.Value || item.value || ''
+  }));
 };
 
 export const getJobs = async () => {
@@ -324,10 +525,8 @@ export const getDatasetByFileName = async (fileName) => {
   switch (fileName) {
     case 'clients.xlsx':
       return await getClients();
-    case 'config.xlsx': {
-      const cfgObj = await getConfig();
-      return Object.keys(cfgObj).map(k => ({ Key: k, Value: cfgObj[k] }));
-    }
+    case 'config.xlsx':
+      return await getConfigList();
     case 'jobs.xlsx':
       return await getJobs();
     case 'news.xlsx':
@@ -344,72 +543,171 @@ export const getDatasetByFileName = async (fileName) => {
 };
 
 // ---------------------------------------------------------
-// CRUD Functions
+// Single-Record CRUD Operations (Auto-ID, Update, Delete)
+// ---------------------------------------------------------
+
+/**
+ * Creates a single record in Supabase (or local fallback).
+ * Automatically generates a unique UUID primary ID if not present.
+ */
+export const createRecord = async (fileName, itemData) => {
+  const config = getTableConfig(fileName);
+  if (!config) {
+    return { success: false, error: `Unknown dataset file: ${fileName}` };
+  }
+
+  // Pre-validate required identifier
+  const mainVal = itemData[config.appUniqueField] || itemData[config.uniqueField];
+  if (!mainVal || String(mainVal).trim() === '') {
+    return { success: false, error: `${config.appUniqueField} is required to create a record.` };
+  }
+
+  const payload = config.toDB(itemData);
+  // Ensure no empty string or invalid id is passed to Supabase
+  if (!isValidUUID(payload.id)) {
+    delete payload.id;
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from(config.table)
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) {
+        console.error(`Supabase create error on ${config.table}:`, error);
+        return { success: false, error: error.message || 'Database insert failed' };
+      }
+
+      const created = config.fromDB(data);
+      return { success: true, data: created };
+    } catch (err) {
+      console.error(`Exception creating record in ${config.table}:`, err);
+      return { success: false, error: err.message || 'Network error' };
+    }
+  }
+
+  // Offline / Local Fallback
+  const newId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'local-' + Date.now();
+  const createdLocal = { ...itemData, id: newId };
+  return { success: true, data: createdLocal, localOnly: true };
+};
+
+/**
+ * Updates an existing record in Supabase by primary ID (or unique field).
+ */
+export const updateRecord = async (fileName, id, itemData) => {
+  const config = getTableConfig(fileName);
+  if (!config) {
+    return { success: false, error: `Unknown dataset file: ${fileName}` };
+  }
+
+  const payload = config.toDB(itemData);
+  delete payload.id; // Do not overwrite primary key
+
+  if (isSupabaseConfigured()) {
+    try {
+      let query = supabase.from(config.table).update(payload);
+      if (isValidUUID(id)) {
+        query = query.eq('id', id);
+      } else if (config.table === 'config') {
+        query = query.eq('key', itemData.Key || itemData.key);
+      } else {
+        const uniqueVal = itemData[config.appUniqueField] || itemData[config.uniqueField];
+        if (uniqueVal) {
+          query = query.eq(config.uniqueField, uniqueVal);
+        } else {
+          return { success: false, error: 'Cannot update: record lacks primary ID and unique key.' };
+        }
+      }
+
+      const { data, error } = await query.select().single();
+      if (error) {
+        console.error(`Supabase update error on ${config.table}:`, error);
+        return { success: false, error: error.message || 'Database update failed' };
+      }
+
+      const updated = config.fromDB(data);
+      return { success: true, data: updated };
+    } catch (err) {
+      console.error(`Exception updating record in ${config.table}:`, err);
+      return { success: false, error: err.message || 'Network error' };
+    }
+  }
+
+  return { success: true, data: { ...itemData, id }, localOnly: true };
+};
+
+/**
+ * Deletes a record from Supabase by primary ID (or unique field).
+ */
+export const deleteRecord = async (fileName, id, itemData) => {
+  const config = getTableConfig(fileName);
+  if (!config) {
+    return { success: false, error: `Unknown dataset file: ${fileName}` };
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      let query = supabase.from(config.table).delete();
+      if (isValidUUID(id)) {
+        query = query.eq('id', id);
+      } else if (config.table === 'config') {
+        query = query.eq('key', itemData?.Key || itemData?.key);
+      } else {
+        const uniqueVal = itemData ? (itemData[config.appUniqueField] || itemData[config.uniqueField]) : null;
+        if (uniqueVal) {
+          query = query.eq(config.uniqueField, uniqueVal);
+        } else {
+          return { success: false, error: 'Cannot delete: record has no valid primary ID or unique identifier.' };
+        }
+      }
+
+      const { error } = await query;
+      if (error) {
+        console.error(`Supabase delete error on ${config.table}:`, error);
+        return { success: false, error: error.message || 'Database delete failed' };
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error(`Exception deleting record from ${config.table}:`, err);
+      return { success: false, error: err.message || 'Network error' };
+    }
+  }
+
+  return { success: true, localOnly: true };
+};
+
+// ---------------------------------------------------------
+// Bulk Dataset Save (for Excel Import & Full Table Overwrites)
 // ---------------------------------------------------------
 export const saveDatasetByFileName = async (fileName, datasetArray) => {
-  if (!isSupabaseConfigured()) {
+  const config = getTableConfig(fileName);
+  if (!isSupabaseConfigured() || !config) {
     saveExcelDataLocal(fileName, datasetArray);
     return { success: true, localOnly: true };
   }
 
   try {
-    switch (fileName) {
-      case 'clients.xlsx': {
-        const payload = datasetArray.map(mapClientToDB);
-        const { error } = await supabase.from('clients').upsert(payload, { onConflict: 'client_name' });
-        if (error) throw error;
-        break;
+    const payload = datasetArray.map(item => {
+      const dbRow = config.toDB(item);
+      if (!isValidUUID(dbRow.id)) {
+        delete dbRow.id;
       }
-      case 'config.xlsx': {
-        const payload = datasetArray.map(item => ({
-          key: item.Key || item.key,
-          value: item.Value || item.value || ''
-        })).filter(r => r.key);
-        const { error } = await supabase.from('config').upsert(payload, { onConflict: 'key' });
-        if (error) throw error;
-        break;
-      }
-      case 'jobs.xlsx': {
-        const payload = datasetArray.map(mapJobToDB);
-        const { error } = await supabase.from('jobs').upsert(payload, { onConflict: 'job_title' });
-        if (error) throw error;
-        break;
-      }
-      case 'news.xlsx': {
-        const payload = datasetArray.map(mapNewsToDB);
-        const { error } = await supabase.from('news').upsert(payload, { onConflict: 'title' });
-        if (error) throw error;
-        break;
-      }
-      case 'projects.xlsx': {
-        const payload = datasetArray.map(mapProjectToDB);
-        const { error } = await supabase.from('projects').upsert(payload, { onConflict: 'title' });
-        if (error) throw error;
-        break;
-      }
-      case 'services.xlsx': {
-        const payload = datasetArray.map(mapServiceToDB);
-        const { error } = await supabase.from('services').upsert(payload, { onConflict: 'service_name' });
-        if (error) throw error;
-        break;
-      }
-      case 'testimonials.xlsx': {
-        const payload = datasetArray.map(mapTestimonialToDB);
-        const { error } = await supabase.from('testimonials').upsert(payload, { onConflict: 'company' });
-        if (error) throw error;
-        break;
-      }
-      default:
-        saveExcelDataLocal(fileName, datasetArray);
-        return { success: true, localOnly: true };
-    }
+      return dbRow;
+    });
 
-    // Save locally as cache
+    const conflictTarget = config.uniqueField;
+    const { error } = await supabase.from(config.table).upsert(payload, { onConflict: conflictTarget });
+    if (error) throw error;
+
     saveExcelDataLocal(fileName, datasetArray);
     return { success: true };
   } catch (error) {
     console.error(`Error saving ${fileName} to Supabase:`, error);
-    // Fallback to local storage if DB fails
     saveExcelDataLocal(fileName, datasetArray);
     return { success: false, error: error.message };
   }
@@ -420,15 +718,23 @@ export const saveDatasetByFileName = async (fileName, datasetArray) => {
 // ---------------------------------------------------------
 export const loginAdmin = async (emailOrUsername, password) => {
   if (isSupabaseConfigured()) {
-    const email = emailOrUsername.includes('@') ? emailOrUsername : `${emailOrUsername}@techinnosphere.com`;
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (!error && data.user) {
-      localStorage.setItem('techinnosphere_auth', 'true');
-      localStorage.setItem('techinnosphere_user', JSON.stringify(data.user));
-      return { success: true, user: data.user };
+    const email = emailOrUsername.includes('@') ? emailOrUsername.trim() : `${emailOrUsername.trim()}@techinnosphere.com`;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (!error && data?.user) {
+        localStorage.setItem('techinnosphere_auth', 'true');
+        localStorage.setItem('techinnosphere_user', JSON.stringify(data.user));
+        return { success: true, user: data.user };
+      }
+      if (error) {
+        // If wrong credentials or invalid grant
+        return { success: false, error: error.message || 'Invalid credentials' };
+      }
+    } catch (e) {
+      console.warn('Supabase auth sign-in error:', e);
     }
   }
 
@@ -438,7 +744,7 @@ export const loginAdmin = async (emailOrUsername, password) => {
     return { success: true, localOnly: true };
   }
 
-  return { success: false, error: 'Invalid credentials' };
+  return { success: false, error: 'Invalid login credentials' };
 };
 
 export const logoutAdmin = async () => {
