@@ -36,6 +36,10 @@ const parseBoolean = (val, defaultVal = true) => {
 
 const parseDate = (val) => {
   if (!val) return null;
+  if (typeof val === 'number') {
+    const date = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
+  }
   const parsed = new Date(val);
   return isNaN(parsed.getTime()) ? null : parsed.toISOString().split('T')[0];
 };
