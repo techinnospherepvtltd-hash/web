@@ -42,8 +42,20 @@ const SEO = ({
     const finalDescription = description || SEO_CONFIG.defaultDescription;
     setMetaTag('name', 'description', finalDescription);
 
-    // 4. Canonical URL
-    const finalCanonical = canonical || `${SEO_CONFIG.siteUrl}${location.pathname}`;
+    // 4. Canonical URL normalization
+    // Ensure non-www and consistent trailing slash: root has '/', subpages do not.
+    const normalizeCanonical = (customCanonical) => {
+      if (customCanonical) {
+        if (customCanonical === SEO_CONFIG.siteUrl || customCanonical === `${SEO_CONFIG.siteUrl}/`) {
+          return `${SEO_CONFIG.siteUrl}/`;
+        }
+        return customCanonical.replace(/\/+$/, '');
+      }
+      const cleanPath = location.pathname.replace(/\/+$/, '');
+      return cleanPath === '' ? `${SEO_CONFIG.siteUrl}/` : `${SEO_CONFIG.siteUrl}${cleanPath}`;
+    };
+
+    const finalCanonical = normalizeCanonical(canonical);
     let canonicalLink = document.querySelector("link[rel='canonical']");
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');

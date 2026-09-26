@@ -90,8 +90,8 @@ const Work = () => {
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative">
       <SEO
-        title="Our Work & Projects | TechInnoSphere"
-        description="Explore software, web, mobile, AI and digital projects delivered by TechInnoSphere for businesses across different industries and markets."
+        title="Software Projects, Web Apps & AI Case Studies | TechInnoSphere Work"
+        description="Explore TechInnoSphere's portfolio of custom software projects, web applications, enterprise systems, AI solutions, and technology case studies."
         canonical="https://techinnosphere.com/work"
         structuredData={structuredData}
       />
@@ -345,7 +345,7 @@ const Work = () => {
                                     {photoUrl ? (
                                       <img 
                                         src={photoUrl} 
-                                        alt={t['Client Name']} 
+                                        alt={`Client ${t['Client Name'] || 'Partner'} - ${t.Company || 'TechInnoSphere'}`} 
                                         className="w-10 h-10 rounded-full object-cover border border-gray-200" 
                                       />
                                     ) : (

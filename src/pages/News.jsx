@@ -55,8 +55,8 @@ const News = () => {
   return (
     <div className="bg-brand-lightest min-h-screen pt-32 pb-24">
       <SEO
-        title="News, Insights & Tech Updates | TechInnoSphere"
-        description="Stay updated with the latest technology trends, artificial intelligence innovations, software development insights, and company announcements from TechInnoSphere."
+        title="Technology News, AI Insights & Software Updates | TechInnoSphere"
+        description="Stay informed with TechInnoSphere's technology news, artificial intelligence insights, custom software development articles, and company announcements."
         canonical="https://techinnosphere.com/news"
         structuredData={structuredData}
       />

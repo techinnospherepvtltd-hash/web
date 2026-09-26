@@ -128,8 +128,8 @@ const Testimonials = () => {
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
       <SEO
-        title="Client Testimonials & Reviews | TechInnoSphere"
-        description="Read reviews and feedback from global clients who partnered with TechInnoSphere for custom software development, AI solutions, web platforms, and mobile apps."
+        title="Client Testimonials & Software Reviews | TechInnoSphere"
+        description="Read genuine client experiences and reviews for TechInnoSphere's software development, AI solutions, web platforms, and technology engineering projects."
         canonical="https://techinnosphere.com/testimonials"
         structuredData={structuredData}
       />
@@ -227,7 +227,7 @@ const Testimonials = () => {
                       {photoUrl ? (
                         <img 
                           src={photoUrl} 
-                          alt={item['Client Name']} 
+                          alt={`${item['Client Name'] || 'Client'} testimonial for TechInnoSphere software solutions`} 
                           className="w-14 h-14 rounded-full object-cover border-2 border-brand-lightest" 
                         />
                       ) : (

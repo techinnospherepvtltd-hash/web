@@ -51,8 +51,8 @@ const Careers = () => {
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
       <SEO
-        title="Careers at TechInnoSphere | Software & Technology Jobs"
-        description="Explore software engineering, AI development, and technology career opportunities at TechInnoSphere in Mumbai and remote. Join our engineering team."
+        title="Careers at TechInnoSphere | Software, Web & AI Engineering Jobs"
+        description="Explore technology careers at TechInnoSphere in Mumbai and remote. We are hiring for software development, web engineering, and AI solution roles."
         canonical="https://techinnosphere.com/careers"
         structuredData={structuredData}
       />

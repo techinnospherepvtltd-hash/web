@@ -19,8 +19,8 @@ const About = () => {
   return (
     <div className="bg-brand-lightest min-h-screen pt-32 pb-24">
       <SEO
-        title="About TechInnoSphere | Software & Technology Solutions Company"
-        description="Learn about TechInnoSphere Software Solutions Pvt. Ltd., a Mumbai-based technology company delivering software development, AI, automation, and digital solutions for businesses."
+        title="About TechInnoSphere | Software Development Company in Mumbai"
+        description="Learn about TechInnoSphere Software Solutions Pvt. Ltd., a Mumbai technology services company delivering business-focused software development and AI for global clients."
         canonical="https://techinnosphere.com/about"
         structuredData={structuredData}
       />

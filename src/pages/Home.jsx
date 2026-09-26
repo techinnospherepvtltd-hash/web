@@ -101,10 +101,9 @@ const Home = () => {
   return (
     <div className="bg-white">
       <SEO
-        title="TechInnoSphere | Software Development & AI Solutions Company"
-        description="TechInnoSphere Software Solutions Pvt. Ltd. is a software development and technology company based in Mumbai, India, offering web and application development, AI solutions, custom software, SAP ABAP, automation, and digital transformation services."
+        title="TechInnoSphere | Web Development, AI & Software Solutions"
+        description="TechInnoSphere Software Solutions Pvt. Ltd. is a Mumbai, India software development company delivering web and application development, custom software, AI solutions, SAP ABAP, automation and digital transformation."
         canonical="https://techinnosphere.com/"
-        structuredData={structuredData}
       />
 
       {/* 1. Hero Section: Primary H1 & Company Introduction */}

@@ -22,8 +22,8 @@ const Contact = () => {
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
       <SEO
-        title="Contact TechInnoSphere | Software Development Company in Mumbai"
-        description="Contact TechInnoSphere Software Solutions Pvt. Ltd. in Mumbai, India for software development, AI solutions, web & mobile applications, and technology consulting."
+        title="Contact TechInnoSphere | Software Development & AI Inquiries"
+        description="Contact TechInnoSphere in Mumbai, India for software development, AI solutions, web & application development projects, and technology consulting."
         canonical="https://techinnosphere.com/contact"
         structuredData={structuredData}
       />
