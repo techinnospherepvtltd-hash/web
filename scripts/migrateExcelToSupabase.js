@@ -4,6 +4,8 @@ import * as XLSX from 'xlsx';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
+const xlsx = XLSX.default || XLSX;
+
 // Load .env or .env.local if present
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
@@ -12,9 +14,13 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('your-supabase-project')) {
-  console.error('Error: Valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY) are required in environment variables.');
+  console.error('Error: Valid VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required in environment variables.');
   process.exit(1);
 }
+
+const isServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+console.log(`Connecting to Supabase at: ${supabaseUrl}`);
+console.log(`Auth Mode: ${isServiceRole ? 'service_role (Admin Bypass RLS)' : 'anon key'}`);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -51,35 +57,47 @@ const cleanString = (val) => {
 };
 
 async function migrate() {
-  console.log('🚀 Starting Excel -> Supabase PostgreSQL Data Migration...');
-  console.log(`Connecting to Supabase at: ${supabaseUrl}`);
+  console.log('\n======================================================');
+  console.log('🚀 Starting Excel -> Supabase PostgreSQL Data Migration');
+  console.log('======================================================\n');
 
   const publicDir = path.join(process.cwd(), 'public');
+  const summary = [];
 
   // 1. Config
   try {
     const filePath = path.join(publicDir, 'config.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.filter(r => r.Key).map(r => ({
         key: String(r.Key).trim(),
         value: cleanString(r.Value)
       }));
-      const { data, error } = await supabase.from('config').upsert(records, { onConflict: 'key' });
-      if (error) console.error('❌ Error migrating config:', error.message);
-      else console.log(`✅ Config: ${records.length} records migrated.`);
+
+      const { error } = await supabase.from('config').upsert(records, { onConflict: 'key' });
+      if (error) {
+        console.error('❌ Error migrating config:', error.message);
+        summary.push({ table: 'config', file: 'config.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('config').select('*', { count: 'exact', head: true });
+        console.log(`✅ Config: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'config', file: 'config.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ config.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed config migration:', err.message);
+    summary.push({ table: 'config', file: 'config.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 2. Clients
   try {
     const filePath = path.join(publicDir, 'clients.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         client_name: cleanString(r['Client Name'] || r.City || 'Client'),
         country: cleanString(r.Country),
@@ -91,20 +109,30 @@ async function migrate() {
         longitude: r.Longitude ? parseFloat(r.Longitude) : null,
         project_count: r['Project Count'] ? parseInt(r['Project Count']) : 1
       }));
+
       const { error } = await supabase.from('clients').upsert(records, { onConflict: 'client_name' });
-      if (error) console.error('❌ Error migrating clients:', error.message);
-      else console.log(`✅ Clients: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating clients:', error.message);
+        summary.push({ table: 'clients', file: 'clients.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('clients').select('*', { count: 'exact', head: true });
+        console.log(`✅ Clients: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'clients', file: 'clients.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ clients.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed clients migration:', err.message);
+    summary.push({ table: 'clients', file: 'clients.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 3. Jobs
   try {
     const filePath = path.join(publicDir, 'jobs.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         job_title: cleanString(r['Job Title']),
         department: cleanString(r.Department),
@@ -116,20 +144,30 @@ async function migrate() {
         google_form_url: cleanString(r['Google Form URL']),
         status: cleanString(r.Status) || 'Open'
       }));
+
       const { error } = await supabase.from('jobs').upsert(records, { onConflict: 'job_title' });
-      if (error) console.error('❌ Error migrating jobs:', error.message);
-      else console.log(`✅ Jobs: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating jobs:', error.message);
+        summary.push({ table: 'jobs', file: 'jobs.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('jobs').select('*', { count: 'exact', head: true });
+        console.log(`✅ Jobs: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'jobs', file: 'jobs.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ jobs.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed jobs migration:', err.message);
+    summary.push({ table: 'jobs', file: 'jobs.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 4. News
   try {
     const filePath = path.join(publicDir, 'news.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         title: cleanString(r.Title),
         description: cleanString(r.Description || r.Summary),
@@ -141,20 +179,30 @@ async function migrate() {
         author: cleanString(r.Author),
         enabled: parseBoolean(r.Enabled || r.Published, true)
       }));
+
       const { error } = await supabase.from('news').upsert(records, { onConflict: 'title' });
-      if (error) console.error('❌ Error migrating news:', error.message);
-      else console.log(`✅ News: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating news:', error.message);
+        summary.push({ table: 'news', file: 'news.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('news').select('*', { count: 'exact', head: true });
+        console.log(`✅ News: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'news', file: 'news.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ news.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed news migration:', err.message);
+    summary.push({ table: 'news', file: 'news.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 5. Projects
   try {
     const filePath = path.join(publicDir, 'projects.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         title: cleanString(r.Title),
         category: cleanString(r.Category),
@@ -178,20 +226,30 @@ async function migrate() {
         featured: parseBoolean(r['Featured Project Toggle'] || r.Featured, false),
         enabled: parseBoolean(r.Enabled, true)
       }));
+
       const { error } = await supabase.from('projects').upsert(records, { onConflict: 'title' });
-      if (error) console.error('❌ Error migrating projects:', error.message);
-      else console.log(`✅ Projects: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating projects:', error.message);
+        summary.push({ table: 'projects', file: 'projects.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+        console.log(`✅ Projects: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'projects', file: 'projects.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ projects.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed projects migration:', err.message);
+    summary.push({ table: 'projects', file: 'projects.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 6. Services
   try {
     const filePath = path.join(publicDir, 'services.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         service_name: cleanString(r['Service Name']),
         short_description: cleanString(r['Short Description']),
@@ -205,20 +263,30 @@ async function migrate() {
         cta_link: cleanString(r['CTA Link']),
         enabled: parseBoolean(r.Enabled, true)
       }));
+
       const { error } = await supabase.from('services').upsert(records, { onConflict: 'service_name' });
-      if (error) console.error('❌ Error migrating services:', error.message);
-      else console.log(`✅ Services: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating services:', error.message);
+        summary.push({ table: 'services', file: 'services.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('services').select('*', { count: 'exact', head: true });
+        console.log(`✅ Services: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'services', file: 'services.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ services.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed services migration:', err.message);
+    summary.push({ table: 'services', file: 'services.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
   // 7. Testimonials
   try {
     const filePath = path.join(publicDir, 'testimonials.xlsx');
     if (fs.existsSync(filePath)) {
-      const wb = XLSX.readFile(filePath);
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const wb = xlsx.readFile(filePath);
+      const rows = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       const records = rows.map(r => ({
         client_name: cleanString(r['Client Name']),
         designation: cleanString(r.Designation),
@@ -230,15 +298,28 @@ async function migrate() {
         related_project: cleanString(r['Related Project']),
         featured: parseBoolean(r.Featured, false)
       }));
+
       const { error } = await supabase.from('testimonials').upsert(records, { onConflict: 'company' });
-      if (error) console.error('❌ Error migrating testimonials:', error.message);
-      else console.log(`✅ Testimonials: ${records.length} records migrated.`);
+      if (error) {
+        console.error('❌ Error migrating testimonials:', error.message);
+        summary.push({ table: 'testimonials', file: 'testimonials.xlsx', read: rows.length, processed: records.length, upserted: 0, status: 'FAILED', error: error.message });
+      } else {
+        const { count } = await supabase.from('testimonials').select('*', { count: 'exact', head: true });
+        console.log(`✅ Testimonials: ${records.length} records processed from Excel, table now has ${count} records.`);
+        summary.push({ table: 'testimonials', file: 'testimonials.xlsx', read: rows.length, processed: records.length, upserted: records.length, currentCount: count, status: 'SUCCESS' });
+      }
+    } else {
+      console.warn('⚠️ testimonials.xlsx not found');
     }
   } catch (err) {
     console.error('❌ Failed testimonials migration:', err.message);
+    summary.push({ table: 'testimonials', file: 'testimonials.xlsx', status: 'EXCEPTION', error: err.message });
   }
 
-  console.log('\n🎉 Migration execution completed.');
+  console.log('\n======================================================');
+  console.log('🎉 Data Migration Summary');
+  console.log('======================================================');
+  console.table(summary);
 }
 
 migrate();
