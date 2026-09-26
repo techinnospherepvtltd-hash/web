@@ -2,13 +2,26 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Code, Shield, Brain, Server, Monitor, Database, Cpu, ShieldCheck, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchExcelData, getDirectImageUrl } from '../utils/excelUtils';
+import { getDirectImageUrl } from '../utils/excelUtils';
+import { getProjects, getClients, getTestimonials, getServices } from '../utils/supabaseUtils';
 import { fetchConfig } from '../utils/configUtils';
 import ClientMap from '../components/ClientMap';
+import SEO from '../components/SEO';
+import { getWebSiteSchema, getOrganizationSchema, getLocalBusinessSchema } from '../config/seo';
 
 // Map icon strings to actual components
 const IconMap = {
   Monitor, Cpu, ShieldCheck, Database, Code, Shield, Brain, Server
+};
+
+const DEFAULT_CONFIG = {
+  HeroHeading: 'Software Development & AI Solutions for Modern Enterprises',
+  HeroSubheading: 'TechInnoSphere architects and engineers high-performance web applications, mobile platforms, custom software, and artificial intelligence solutions for businesses across India and global markets.',
+  HeroButtonPrimaryText: 'Start Your Project',
+  HeroButtonPrimaryLink: '/contact',
+  HeroButtonSecondaryText: 'Explore Our Work',
+  HeroButtonSecondaryLink: '/work',
+  CompanyName: 'TechInnoSphere'
 };
 
 const Home = () => {
@@ -16,7 +29,7 @@ const Home = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [services, setServices] = useState([]);
   const [featuredProjects, setFeaturedProjects] = useState([]);
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
@@ -41,12 +54,14 @@ const Home = () => {
   useEffect(() => {
     const loadData = async () => {
       const cfg = await fetchConfig();
-      setConfig(cfg);
+      if (cfg && Object.keys(cfg).length > 0) {
+        setConfig((prev) => ({ ...prev, ...cfg }));
+      }
 
-      const projectsData = await fetchExcelData('projects.xlsx');
-      const clientsData = await fetchExcelData('clients.xlsx');
-      const testimsData = await fetchExcelData('testimonials.xlsx');
-      const servicesData = await fetchExcelData('services.xlsx');
+      const projectsData = await getProjects();
+      const clientsData = await getClients();
+      const testimsData = await getTestimonials();
+      const servicesData = await getServices();
 
       const isEnabled = (val) => {
         if (val === undefined || val === null) return true;
@@ -74,10 +89,24 @@ const Home = () => {
     loadData();
   }, []);
 
-  if (!config) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getWebSiteSchema(),
+      getOrganizationSchema(),
+      getLocalBusinessSchema()
+    ]
+  };
 
   return (
     <div className="bg-white">
+      <SEO
+        title="TechInnoSphere | Software Development & AI Solutions Company"
+        description="TechInnoSphere is a software development and technology company offering web and app development, AI solutions, custom software, SAP ABAP, automation, and digital services from Mumbai, India."
+        canonical="https://techinnosphere.com/"
+        structuredData={structuredData}
+      />
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-[#FAFAFA]">
         <div className="absolute inset-0 bg-gradient-to-b from-[#F0F2F5] to-transparent z-0 opacity-50"></div>
@@ -90,7 +119,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[1.1] text-[#111827]"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-8 leading-[1.1] text-[#111827]"
             >
               {config.HeroHeading}
             </motion.h1>
@@ -108,42 +137,33 @@ const Home = () => {
               transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link to={config.HeroButtonPrimaryLink || "/contact"} className="w-full sm:w-auto px-8 py-4 bg-brand-primary text-white rounded-xl font-bold text-lg hover:bg-brand-dark transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(20,52,129,0.2)] flex items-center justify-center gap-2">
+              <Link
+                to={config.HeroButtonPrimaryLink || "/contact"}
+                className="w-full sm:w-auto px-8 py-4 bg-brand-primary text-white rounded-xl font-bold text-lg hover:bg-brand-dark transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(20,52,129,0.2)] flex items-center justify-center gap-2"
+              >
                 {config.HeroButtonPrimaryText || "Start Your Project"} <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link to={config.HeroButtonSecondaryLink || "/work"} className="w-full sm:w-auto px-8 py-4 bg-white border border-gray-200 text-gray-800 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-2">
-                {config.HeroButtonSecondaryText || "View Our Work"}
+              <Link
+                to={config.HeroButtonSecondaryLink || "/work"}
+                className="w-full sm:w-auto px-8 py-4 bg-white border border-gray-200 text-gray-800 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-2"
+              >
+                {config.HeroButtonSecondaryText || "Explore Our Work"}
               </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      {/* <section className="py-12 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { value: `${stats.projects > 0 ? stats.projects : 50}+`, label: 'Projects Delivered' },
-              { value: `${stats.clients > 0 ? stats.clients : 20}+`, label: 'Global Clients' },
-              { value: `${stats.countries > 0 ? stats.countries : 6}+`, label: 'Countries Served' },
-              { value: '99%', label: 'Client Satisfaction' }
-            ].map((stat, idx) => (
-              <div key={idx} className="text-center">
-                <h3 className="text-4xl font-bold text-brand-darker tracking-tight mb-2">{stat.value}</h3>
-                <p className="text-gray-500 font-semibold tracking-wide text-xs uppercase">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      */}
       {/* Dynamic Services Preview */}
       <section className="py-32 bg-[#FAFAFA]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-3xl mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">Enterprise-Grade Solutions</h2>
-            <p className="text-xl text-gray-500">We build robust, scalable, and secure applications tailored to your business needs.</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+              Enterprise-Grade Technology Solutions
+            </h2>
+            <p className="text-xl text-gray-500">
+              We design, build, and deploy robust, scalable, and secure digital applications tailored to your business needs.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, idx) => {
@@ -160,12 +180,23 @@ const Home = () => {
                   </div>
                   <h3 className="text-xl font-bold text-brand-darker mb-3">{service['Service Name']}</h3>
                   <p className="text-gray-500 leading-relaxed mb-6 flex-grow">{service['Short Description']}</p>
-                  <Link to={service['CTA Link'] || '/services'} className="text-brand-primary font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <Link
+                    to={service['CTA Link'] || '/services'}
+                    className="text-brand-primary font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all"
+                  >
                     {service['CTA Text'] || 'Learn More'} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </motion.div>
               );
             })}
+          </div>
+          <div className="mt-12 text-center">
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 text-brand-primary font-bold hover:text-brand-dark transition-colors"
+            >
+              Explore our software development services <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -175,10 +206,17 @@ const Home = () => {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex justify-between items-end mb-20">
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">Featured Work</h2>
-              <p className="text-xl text-gray-500">A selection of our most impactful enterprise projects.</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+                Featured Projects &amp; Case Studies
+              </h2>
+              <p className="text-xl text-gray-500">
+                A selection of high-impact enterprise software, web, mobile, and AI solutions engineered for global organizations.
+              </p>
             </div>
-            <Link to="/work" className="hidden md:flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
+            <Link
+              to="/work"
+              className="hidden md:flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all"
+            >
               View All Projects <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -194,7 +232,12 @@ const Home = () => {
               >
                 <div className="aspect-video bg-gray-100 rounded-3xl overflow-hidden mb-6 relative">
                   {project.Image ? (
-                    <img src={project.Image} alt={project.Title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img
+                      src={project.Image}
+                      alt={`TechInnoSphere project for ${project.Title} - ${project.Category}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
                       <span className="text-gray-400 font-bold text-xl">{project.Title}</span>
@@ -204,7 +247,9 @@ const Home = () => {
                     {project.Category}
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-brand-darker mb-2 group-hover:text-brand-primary transition-colors">{project.Title}</h3>
+                <h3 className="text-2xl font-bold text-brand-darker mb-2 group-hover:text-brand-primary transition-colors">
+                  {project.Title}
+                </h3>
                 <p className="text-gray-500 line-clamp-2">{project['Short Description'] || project.Description}</p>
               </motion.div>
             ))}
@@ -223,8 +268,12 @@ const Home = () => {
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">What Our Clients Say</h2>
-              <p className="text-xl text-gray-500 font-medium">Trusted by fast-growing startups and established enterprises alike.</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+                What Our Clients Say
+              </h2>
+              <p className="text-xl text-gray-500 font-medium">
+                Trusted by fast-growing startups and established enterprises across the globe.
+              </p>
             </div>
             <Link to="/testimonials" className="mt-6 md:mt-0 flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
               View All Testimonials <ArrowRight className="w-5 h-5" />
@@ -275,14 +324,19 @@ const Home = () => {
                         </div>
                         <div className="flex items-center gap-4 border-t border-gray-200/50 pt-4">
                           {photoUrl ? (
-                            <img src={photoUrl} alt={t['Client Name']} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                            <img
+                              src={photoUrl}
+                              alt={`${t['Client Name']} testimonial for TechInnoSphere`}
+                              loading="lazy"
+                              className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                            />
                           ) : (
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-dark/20 text-brand-dark flex items-center justify-center font-bold text-sm">
                               {(t['Client Name'] || 'C').substring(0, 1).toUpperCase()}
                             </div>
                           )}
                           <div>
-                            <h4 className="font-extrabold text-brand-darker text-sm md:text-base leading-tight">{t['Client Name']}</h4>
+                            <h3 className="font-extrabold text-brand-darker text-sm md:text-base leading-tight">{t['Client Name']}</h3>
                             <p className="text-xs text-gray-500 font-bold leading-none mt-1">{t.Designation || t.Role || 'Director'} at <span className="text-brand-primary">{t.Company}</span></p>
                           </div>
                         </div>
@@ -313,9 +367,11 @@ const Home = () => {
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="w-full lg:w-1/3">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">Global Presence</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-brand-darker tracking-tight mb-6">
+                Global Technology Partnerships
+              </h2>
               <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-                From Mumbai to Canada, Dubai, Austria and beyond. We serve clients across the globe, providing reliable technology partnerships regardless of borders.
+                Headquartered in Mumbai, India, TechInnoSphere delivers digital solutions to enterprises across India, Dubai, Canada, Austria, and worldwide. We provide seamless communication, transparent project management, and reliable delivery across time zones.
               </p>
             </div>
             <div className="w-full lg:w-2/3">
@@ -330,10 +386,17 @@ const Home = () => {
         <div className="absolute inset-0 bg-brand-primary/20 mix-blend-multiply"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-20"></div>
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <h2 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">Ready to Scale?</h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-medium">Join leading businesses worldwide who trust TechInnoSphere with their core technology infrastructure.</p>
-          <Link to="/contact" className="px-10 py-5 bg-white text-brand-darker rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all shadow-[0_8px_30px_rgb(255,255,255,0.1)] inline-flex items-center gap-3">
-            Contact Our Team <ArrowRight className="w-5 h-5" />
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
+            Ready to Build Your Software System?
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-medium">
+            Join leading businesses worldwide who trust TechInnoSphere to engineer their web applications, mobile platforms, and AI systems.
+          </p>
+          <Link
+            to="/contact"
+            className="px-10 py-5 bg-white text-brand-darker rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all shadow-[0_8px_30px_rgb(255,255,255,0.1)] inline-flex items-center gap-3"
+          >
+            Contact Our Engineering Team <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>

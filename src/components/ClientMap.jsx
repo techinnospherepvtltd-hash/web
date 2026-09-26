@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { fetchExcelData } from '../utils/excelUtils';
+import { getClients } from '../utils/supabaseUtils';
 import { Briefcase } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 
@@ -26,7 +26,7 @@ const ClientMap = () => {
 
   useEffect(() => {
     const loadClients = async () => {
-      const data = await fetchExcelData('clients.xlsx');
+      const data = await getClients();
       setClients(data);
     };
     loadClients();

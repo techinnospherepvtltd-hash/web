@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Dashboard from './Dashboard';
+import { logoutAdmin } from '../utils/supabaseUtils';
+import SEO from '../components/SEO';
 
 const AdminLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,8 +25,8 @@ const AdminLayout = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('techinnosphere_auth');
+  const handleLogout = async () => {
+    await logoutAdmin();
     setIsAuthenticated(false);
     navigate('/admin');
   };
@@ -36,10 +38,13 @@ const AdminLayout = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
-      <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
-    </Routes>
+    <>
+      <SEO title="Admin Portal | TechInnoSphere" noIndex={true} />
+      <Routes>
+        <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
+        <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
+      </Routes>
+    </>
   );
 };
 

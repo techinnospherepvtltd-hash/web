@@ -38,7 +38,7 @@ const Navbar = () => {
       <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 z-50">
           {config.CompanyLogo ? (
-            <img src={config.CompanyLogo} alt={config.CompanyName} className="h-14 md:h-16 object-contain" />
+            <img src={config.CompanyLogo} alt={`${config.CompanyName || 'TechInnoSphere'} Software Solutions logo`} className="h-14 md:h-16 object-contain" />
           ) : (
             <span className={`text-xl font-bold tracking-tighter ${isScrolled ? 'text-brand-darker' : 'text-brand-darker'}`}>
               {config.CompanyName || 'TechInnoSphere'}
@@ -47,7 +47,6 @@ const Navbar = () => {
           <p style={{ fontSize: 'x-large' }}>
             {config.CompanyName || 'TechInnoSphere'}
           </p>
-
         </Link>
 
         {/* Desktop Nav */}
@@ -67,17 +66,17 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-4 z-50">
           <div className="flex items-center gap-3 border-r border-gray-200 pr-4">
             {config.InstagramURL && (
-              <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-pink-600 transition-colors">
+              <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on Instagram" className="text-gray-400 hover:text-pink-600 transition-colors">
                 <InstagramIcon className="w-5 h-5" />
               </a>
             )}
             {config.FacebookURL && (
-              <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
+              <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on Facebook" className="text-gray-400 hover:text-blue-600 transition-colors">
                 <FacebookIcon className="w-5 h-5" />
               </a>
             )}
             {config.WhatsAppNumber && (
-              <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-500 transition-colors">
+              <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on WhatsApp" className="text-gray-400 hover:text-green-500 transition-colors">
                 <MessageCircle className="w-5 h-5" />
               </a>
             )}
@@ -88,7 +87,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu Toggle */}
-        <button className="md:hidden text-brand-darker z-50 relative" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <button aria-label="Toggle navigation menu" className="md:hidden text-brand-darker z-50 relative" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>

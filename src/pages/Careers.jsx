@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchExcelData } from '../utils/excelUtils';
-import { Briefcase, MapPin, Clock, FileText, CheckCircle2, X, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { getJobs } from '../utils/supabaseUtils';
+import { Briefcase, MapPin, Clock, FileText, CheckCircle2, X, ExternalLink, Code2, Rocket, Users, Award } from 'lucide-react';
+import SEO from '../components/SEO';
+import { getBreadcrumbSchema } from '../config/seo';
 
 const Careers = () => {
   const [jobs, setJobs] = useState([]);
@@ -9,7 +12,7 @@ const Careers = () => {
 
   useEffect(() => {
     const loadJobs = async () => {
-      const data = await fetchExcelData('jobs.xlsx');
+      const data = await getJobs();
       // Filter only Open jobs
       const openJobs = data.filter(job => job.Status === 'Open' || job.Status === 'open');
       setJobs(openJobs);
@@ -35,8 +38,24 @@ const Careers = () => {
     }
   };
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Careers at TechInnoSphere', url: '/careers' }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
+      <SEO
+        title="Careers at TechInnoSphere | Software & Technology Jobs"
+        description="Explore software engineering, AI development, and technology career opportunities at TechInnoSphere in Mumbai and remote. Join our engineering team."
+        canonical="https://techinnosphere.com/careers"
+        structuredData={structuredData}
+      />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0 pointer-events-none"></div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -44,17 +63,17 @@ const Careers = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
           >
-            Join Our Team
+            Careers at TechInnoSphere
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-500 font-medium leading-relaxed"
+            className="text-lg sm:text-xl text-gray-500 font-medium leading-relaxed"
           >
-            Build the future of technology with us. We are always looking for passionate engineers, designers, and innovators to join our global team.
+            Build high-performance software, enterprise platforms, and artificial intelligence systems with us. We are always looking for passionate engineers, designers, and innovators to join our team in Mumbai and remotely.
           </motion.p>
         </div>
 
@@ -105,6 +124,39 @@ const Careers = () => {
               <p className="text-gray-500 font-medium">Please check back later or send your resume to careers@techinnosphere.com</p>
             </div>
           )}
+        </div>
+
+        {/* Culture & Benefits Section */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-brand-darker mb-4">
+            Why Engineer Your Career at TechInnoSphere?
+          </h2>
+          <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12 text-lg">
+            We foster an engineering-first culture where curious minds build scalable products for global impact.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <Code2 className="w-10 h-10 text-brand-primary mb-4" />
+              <h3 className="text-xl font-bold text-brand-darker mb-2">Modern Technology</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Work directly with modern stacks: React 19, Next.js, Node.js, Python, PostgreSQL, LLMs, and cloud-native infrastructure.
+              </p>
+            </div>
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <Rocket className="w-10 h-10 text-brand-primary mb-4" />
+              <h3 className="text-xl font-bold text-brand-darker mb-2">Rapid Growth</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Take ownership of features from day one, collaborate directly with founders, and accelerate your engineering trajectory.
+              </p>
+            </div>
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <Users className="w-10 h-10 text-brand-primary mb-4" />
+              <h3 className="text-xl font-bold text-brand-darker mb-2">Collaborative Culture</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                A meritocratic team environment where clear code, thoughtful architecture, and peer learning are celebrated.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

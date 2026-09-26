@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchExcelData, getDirectImageUrl } from '../utils/excelUtils';
+import { Link } from 'react-router-dom';
+import { getDirectImageUrl } from '../utils/excelUtils';
+import { getProjects, getTestimonials } from '../utils/supabaseUtils';
 import { ExternalLink, Calendar, MapPin, X, ChevronLeft, ChevronRight, Briefcase, Star, Target, Lightbulb, TrendingUp, Quote } from 'lucide-react';
+import SEO from '../components/SEO';
+import { getBreadcrumbSchema } from '../config/seo';
 
 const Work = () => {
   const [projects, setProjects] = useState([]);
@@ -12,13 +16,13 @@ const Work = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchExcelData('projects.xlsx');
+      const data = await getProjects();
       setProjects(data);
       const uniqueCategories = ['All', ...new Set(data.map(p => p.Category).filter(Boolean))];
       setCategories(uniqueCategories);
 
       // Load testimonials
-      const testims = await fetchExcelData('testimonials.xlsx');
+      const testims = await getTestimonials();
       setTestimonials(testims);
 
       // Check query param to auto-select project
@@ -73,8 +77,24 @@ const Work = () => {
 
   const selectedProject = selectedProjectIndex !== null ? filteredProjects[selectedProjectIndex] : null;
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Our Work & Case Studies', url: '/work' }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative">
+      <SEO
+        title="Our Work & Projects | TechInnoSphere"
+        description="Explore software, web, mobile, AI and digital projects delivered by TechInnoSphere for businesses across different industries and markets."
+        canonical="https://techinnosphere.com/work"
+        structuredData={structuredData}
+      />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0 pointer-events-none"></div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -82,17 +102,17 @@ const Work = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
           >
-            Our Work
+            Our Work &amp; Case Studies
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-500 font-medium leading-relaxed"
+            className="text-lg sm:text-xl text-gray-500 font-medium leading-relaxed"
           >
-            Explore our premium portfolio of highly scalable enterprise systems, cutting-edge AI integrations, and beautifully crafted web applications.
+            Explore our portfolio of custom software, enterprise platforms, web applications, and AI integrations delivered by TechInnoSphere for organizations worldwide.
           </motion.p>
         </div>
 
@@ -126,7 +146,12 @@ const Work = () => {
             >
               <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden flex items-center justify-center">
                 {project.Image ? (
-                  <img src={project.Image} alt={project.Title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img
+                    src={project.Image}
+                    alt={`TechInnoSphere project for ${project.Title} - ${project.Industry || project.Category}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 ) : (
                   <div className="text-gray-400 font-bold text-3xl tracking-wider transition-transform duration-700 group-hover:scale-110">
                     {project.Title.substring(0, 2).toUpperCase()}
@@ -157,6 +182,22 @@ const Work = () => {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Bottom CTA for contextual internal linking */}
+        <div className="mt-20 p-10 bg-white rounded-3xl border border-gray-100 shadow-sm text-center max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#111827] mb-3">
+            Have a Similar Software or AI Project?
+          </h2>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Partner with TechInnoSphere to design, engineer, and deploy high-performance applications tailored to your business operations.
+          </p>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center px-8 py-3.5 bg-brand-primary text-white font-bold rounded-xl hover:bg-brand-dark transition-all shadow-md"
+          >
+            Discuss Your Project With TechInnoSphere
+          </Link>
         </div>
       </div>
 
@@ -196,7 +237,11 @@ const Work = () => {
                 {/* Banner */}
                 <div className="w-full aspect-[21/9] md:aspect-[3/1] bg-gray-100 relative">
                   {selectedProject.Image ? (
-                    <img src={selectedProject.Image} alt={selectedProject.Title} className="w-full h-full object-cover" />
+                    <img
+                      src={selectedProject.Image}
+                      alt={`TechInnoSphere case study for ${selectedProject.Title}`}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-brand-primary/10 to-brand-darker/10 flex items-center justify-center">
                        <span className="text-brand-darker/20 font-bold text-6xl tracking-tighter">CASE STUDY</span>

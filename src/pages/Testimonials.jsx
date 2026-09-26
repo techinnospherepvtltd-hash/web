@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchExcelData, getDirectImageUrl } from '../utils/excelUtils';
+import { getDirectImageUrl } from '../utils/excelUtils';
+import { getTestimonials } from '../utils/supabaseUtils';
 import { Star, Search, Filter, MapPin, Briefcase, ExternalLink, X, Quote, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { getBreadcrumbSchema } from '../config/seo';
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -29,7 +32,7 @@ const Testimonials = () => {
 
   useEffect(() => {
     const loadTestimonials = async () => {
-      const data = await fetchExcelData('testimonials.xlsx');
+      const data = await getTestimonials();
       setTestimonials(data);
       setFiltered(data);
 
@@ -112,8 +115,24 @@ const Testimonials = () => {
 
   const featuredItems = testimonials.filter(isFeatured).slice(0, 3);
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Client Testimonials', url: '/testimonials' }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
+      <SEO
+        title="Client Testimonials & Reviews | TechInnoSphere"
+        description="Read reviews and feedback from global clients who partnered with TechInnoSphere for custom software development, AI solutions, web platforms, and mobile apps."
+        canonical="https://techinnosphere.com/testimonials"
+        structuredData={structuredData}
+      />
       {/* Background patterns Vercel-style */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0 pointer-events-none"></div>
       
@@ -327,7 +346,8 @@ const Testimonials = () => {
                     {photoUrl ? (
                       <img 
                         src={photoUrl} 
-                        alt={item['Client Name']} 
+                        alt={`${item['Client Name']} testimonial for TechInnoSphere`}
+                        loading="lazy"
                         className="w-10 h-10 rounded-full object-cover border border-gray-200" 
                       />
                     ) : (
@@ -354,6 +374,22 @@ const Testimonials = () => {
             <p className="text-gray-500 text-sm">Try clearing filters or checking another spelling.</p>
           </div>
         )}
+
+        {/* Bottom CTA for contextual internal linking */}
+        <div className="mt-20 p-10 bg-white rounded-3xl border border-gray-100 shadow-sm text-center max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#111827] mb-3">
+            Ready to Build Your Next Digital Platform?
+          </h2>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Join leading organizations worldwide that trust TechInnoSphere for custom software engineering and artificial intelligence.
+          </p>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center px-8 py-3.5 bg-brand-primary text-white font-bold rounded-xl hover:bg-brand-dark transition-all shadow-md"
+          >
+            Contact TechInnoSphere
+          </Link>
+        </div>
       </div>
 
       {/* Premium Testimonial Details Modal */}
@@ -387,7 +423,7 @@ const Testimonials = () => {
                   {selectedTestimonial['Client Photo'] ? (
                     <img 
                       src={getDirectImageUrl(selectedTestimonial['Client Photo'])} 
-                      alt={selectedTestimonial['Client Name']} 
+                      alt={`${selectedTestimonial['Client Name']} testimonial for TechInnoSphere`} 
                       className="w-16 h-16 rounded-full object-cover border-2 border-brand-lightest" 
                     />
                   ) : (

@@ -2,12 +2,32 @@ import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Send, MessageCircle } from 'lucide-react';
 import { InstagramIcon, FacebookIcon } from '../components/SocialIcons';
 import { useConfig } from '../context/ConfigContext';
+import SEO from '../components/SEO';
+import { getBreadcrumbSchema, getLocalBusinessSchema } from '../config/seo';
 
 const Contact = () => {
   const config = useConfig();
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Contact TechInnoSphere', url: '/contact' }
+      ]),
+      getLocalBusinessSchema()
+    ]
+  };
+
   return (
     <div className="bg-[#FAFAFA] min-h-screen pt-32 pb-24 relative overflow-hidden">
+      <SEO
+        title="Contact TechInnoSphere | Software Development Company in Mumbai"
+        description="Contact TechInnoSphere Software Solutions Pvt. Ltd. in Mumbai, India for software development, AI solutions, web & mobile applications, and technology consulting."
+        canonical="https://techinnosphere.com/contact"
+        structuredData={structuredData}
+      />
+
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0wIDEwbDQwIDBNMTAgMGwwIDQwIiAvPjwvZz48L3N2Zz4=')] opacity-60 z-0 pointer-events-none"></div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -15,49 +35,71 @@ const Contact = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-[#111827] tracking-tight mb-6"
           >
-            Get In Touch
+            Contact TechInnoSphere
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-500 font-medium leading-relaxed"
+            className="text-lg sm:text-xl text-gray-500 font-medium leading-relaxed"
           >
-            Ready to build scalable software? Contact our team or reach out globally.
+            Ready to build scalable software, deploy an AI workflow, or discuss a technology partnership? Reach out to our engineering team in Mumbai, India. We serve clients locally and internationally.
           </motion.p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Info */}
+          {/* Contact Info Side */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100">
               <div className="w-14 h-14 bg-brand-lightest rounded-2xl flex items-center justify-center mb-6">
                 <MapPin className="w-6 h-6 text-brand-primary" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{config.CompanyName || 'TechInnoSphere'}</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">{config.CompanyAddress}</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{config.CompanyName || 'TechInnoSphere Software Solutions'}</h2>
+              <p className="text-gray-500 font-medium leading-relaxed">{config.CompanyAddress || 'Mumbai, Maharashtra, India'}</p>
             </div>
             
             <div className="bg-white p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100">
               <div className="w-14 h-14 bg-brand-lightest rounded-2xl flex items-center justify-center mb-6">
                 <Phone className="w-6 h-6 text-brand-primary" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">WhatsApp</h3>
-              <p className="text-gray-500 font-medium">{config.WhatsAppNumber}</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">WhatsApp &amp; Direct Call</h2>
+              <p className="text-gray-500 font-medium">{config.WhatsAppNumber || '+917710031550'}</p>
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Social Media</h3>
+              <div className="w-14 h-14 bg-brand-lightest rounded-2xl flex items-center justify-center mb-6">
+                <Mail className="w-6 h-6 text-brand-primary" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Email Address</h2>
+              <a href={`mailto:${config.ContactEmail || 'careers@techinnosphere.com'}`} className="text-brand-primary font-medium hover:underline">
+                {config.ContactEmail || 'careers@techinnosphere.com'}
+              </a>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Connect on Social Media</h2>
               <div className="flex gap-4">
                 {config.InstagramURL && (
-                  <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-pink-50 hover:text-pink-600 transition-colors text-gray-500">
+                  <a
+                    href={config.InstagramURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="TechInnoSphere on Instagram"
+                    className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-pink-50 hover:text-pink-600 transition-colors text-gray-500"
+                  >
                     <InstagramIcon className="w-5 h-5" />
                   </a>
                 )}
                 {config.FacebookURL && (
-                  <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-colors text-gray-500">
+                  <a
+                    href={config.FacebookURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="TechInnoSphere on Facebook"
+                    className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-colors text-gray-500"
+                  >
                     <FacebookIcon className="w-5 h-5" />
                   </a>
                 )}
@@ -65,12 +107,13 @@ const Contact = () => {
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100 text-center">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Start Your Project Today</h3>
-              <p className="text-gray-500 mb-6 font-medium">Let's discuss how we can help you achieve your goals.</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Start Your Project Today</h2>
+              <p className="text-gray-500 mb-6 font-medium">Let's discuss how we can help you build your digital platform.</p>
               <a 
-                href={`https://wa.me/${config.WhatsAppNumber?.replace(/\D/g, '')}`} 
+                href={`https://wa.me/${config.WhatsAppNumber?.replace(/\D/g, '') || '917710031550'}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="Chat directly with TechInnoSphere on WhatsApp"
                 className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white p-4 rounded-xl font-bold hover:bg-[#128C7E] transition-all shadow-[0_4px_14px_rgba(37,211,102,0.4)] hover:-translate-y-1"
               >
                 <MessageCircle className="w-6 h-6" /> Chat on WhatsApp
@@ -85,25 +128,25 @@ const Contact = () => {
               <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">First Name</label>
-                    <input type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="John" />
+                    <label htmlFor="first-name" className="block text-sm font-bold text-gray-700 mb-2">First Name</label>
+                    <input id="first-name" name="firstName" type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="John" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Last Name</label>
-                    <input type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Doe" />
+                    <label htmlFor="last-name" className="block text-sm font-bold text-gray-700 mb-2">Last Name</label>
+                    <input id="last-name" name="lastName" type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Doe" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                  <input type="email" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="john@example.com" />
+                  <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                  <input id="email" name="email" type="email" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="john@example.com" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
-                  <input type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Project Inquiry" />
+                  <label htmlFor="subject" className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
+                  <input id="subject" name="subject" type="text" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Project Inquiry / Software Development" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Message</label>
-                  <textarea rows="5" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Tell us about your project..."></textarea>
+                  <label htmlFor="message" className="block text-sm font-bold text-gray-700 mb-2">Message</label>
+                  <textarea id="message" name="message" rows="5" className="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 transition-all font-medium" placeholder="Tell us about your project requirements, technology stack, and timeline..."></textarea>
                 </div>
                 <button type="submit" className="w-full bg-[#111827] text-white font-bold text-lg p-4 rounded-xl hover:bg-brand-primary transition-all flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:-translate-y-1">
                   Send Message <Send className="w-5 h-5" />

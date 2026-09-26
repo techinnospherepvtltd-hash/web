@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { fetchExcelData, saveExcelDataLocal, downloadExcel } from '../utils/excelUtils';
+import { downloadExcel } from '../utils/excelUtils';
+import { getDatasetByFileName, saveDatasetByFileName, getProjects, getServices, getNews, getClients, getTestimonials, getJobs } from '../utils/supabaseUtils';
 import * as XLSX from 'xlsx';
 import { LogOut, Download, Upload, Plus, Trash2, LayoutDashboard, Database, Activity, Settings, Edit, Save, XCircle, AlertTriangle, Check } from 'lucide-react';
 import { useConfig } from '../context/ConfigContext';
@@ -91,12 +92,12 @@ const Dashboard = ({ onLogout }) => {
 
   const loadAnalytics = async () => {
     setLoading(true);
-    const p = await fetchExcelData('projects.xlsx');
-    const s = await fetchExcelData('services.xlsx');
-    const n = await fetchExcelData('news.xlsx');
-    const c = await fetchExcelData('clients.xlsx');
-    const t = await fetchExcelData('testimonials.xlsx');
-    const j = await fetchExcelData('jobs.xlsx');
+    const p = await getProjects();
+    const s = await getServices();
+    const n = await getNews();
+    const c = await getClients();
+    const t = await getTestimonials();
+    const j = await getJobs();
     
     setAnalytics({
       projects: p.length,
@@ -111,7 +112,7 @@ const Dashboard = ({ onLogout }) => {
 
   const loadData = async (fileName) => {
     setLoading(true);
-    const result = await fetchExcelData(fileName);
+    const result = await getDatasetByFileName(fileName);
     setData(result);
     setLoading(false);
   };
@@ -120,12 +121,12 @@ const Dashboard = ({ onLogout }) => {
     downloadExcel(data, activeTab);
   };
 
-  const handleImport = (e) => {
+  const handleImport = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: 'binary' });
       const wsname = wb.SheetNames[0];
@@ -136,7 +137,7 @@ const Dashboard = ({ onLogout }) => {
       const normalizedResult = normalizeImportedData(activeTab, result);
       
       setData(normalizedResult);
-      saveExcelDataLocal(activeTab, normalizedResult);
+      await saveDatasetByFileName(activeTab, normalizedResult);
       
       // Always reload the page to refresh all active contexts and components
       window.location.reload();
@@ -158,11 +159,11 @@ const Dashboard = ({ onLogout }) => {
     }));
   };
 
-  const handleSaveEdit = (index) => {
+  const handleSaveEdit = async (index) => {
     const newData = [...data];
     newData[index] = { ...editingRowData };
     setData(newData);
-    saveExcelDataLocal(activeTab, newData);
+    await saveDatasetByFileName(activeTab, newData);
     setEditingRowIndex(null);
     setEditingRowData({});
     if (activeTab === 'config.xlsx') {
@@ -179,7 +180,9 @@ const Dashboard = ({ onLogout }) => {
   const handleStartAdd = () => {
     const template = {};
     if (data.length > 0) {
-      Object.keys(data[0]).forEach(key => template[key] = '');
+      Object.keys(data[0]).forEach(key => {
+        if (key !== 'id') template[key] = '';
+      });
     } else {
       template['Key'] = '';
       template['Value'] = '';
@@ -208,11 +211,11 @@ const Dashboard = ({ onLogout }) => {
     }));
   };
 
-  const handleConfirmAdd = () => {
+  const handleConfirmAdd = async () => {
     const newData = [...data];
     newData.push({ ...newRowData });
     setData(newData);
-    saveExcelDataLocal(activeTab, newData);
+    await saveDatasetByFileName(activeTab, newData);
     setIsAdding(false);
     setNewRowData({});
     if (activeTab === 'config.xlsx') {
@@ -230,13 +233,13 @@ const Dashboard = ({ onLogout }) => {
     setDeleteConfirmIndex(index);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteConfirmIndex !== null) {
       const index = deleteConfirmIndex;
       const newData = [...data];
       newData.splice(index, 1);
       setData(newData);
-      saveExcelDataLocal(activeTab, newData);
+      await saveDatasetByFileName(activeTab, newData);
       setDeleteConfirmIndex(null);
       
       if (editingRowIndex === index) {

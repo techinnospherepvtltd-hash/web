@@ -1,0 +1,12 @@
+# robots.txt for TechInnoSphere Software Solutions Pvt. Ltd.
+# Website: https://techinnosphere.com/
+
+User-agent: *
+Allow: /
+
+# Disallow private and administrative areas
+Disallow: /admin
+Disallow: /admin/
+
+# XML Sitemap reference
+Sitemap: https://techinnosphere.com/sitemap.xml

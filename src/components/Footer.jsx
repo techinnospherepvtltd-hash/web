@@ -19,8 +19,9 @@ const Footer = () => {
               {config.CompanyLogo ? (
                 <img
                   src={config.CompanyLogo}
-                  alt={config.CompanyName}
+                  alt={`${config.CompanyName || 'TechInnoSphere'} Software Solutions logo`}
                   className="h-20 object-contain"
+                  loading="lazy"
                 />
               ) : (
                 <div className="flex items-center gap-2">
@@ -28,7 +29,6 @@ const Footer = () => {
                   <span className="text-4xl font-bold tracking-tighter">
                     {config.CompanyName || 'TechInnoSphere'}
                   </span>
-
                 </div>
               )}
             </Link>
@@ -40,17 +40,17 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               {config.InstagramURL && (
-                <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-pink-600 transition-colors text-gray-300 hover:text-white">
+                <a href={config.InstagramURL} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on Instagram" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-pink-600 transition-colors text-gray-300 hover:text-white">
                   <InstagramIcon className="w-5 h-5" />
                 </a>
               )}
               {config.FacebookURL && (
-                <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-blue-600 transition-colors text-gray-300 hover:text-white">
+                <a href={config.FacebookURL} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on Facebook" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-blue-600 transition-colors text-gray-300 hover:text-white">
                   <FacebookIcon className="w-5 h-5" />
                 </a>
               )}
               {config.WhatsAppNumber && (
-                <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-green-500 transition-colors text-gray-300 hover:text-white">
+                <a href={`https://wa.me/${config.WhatsAppNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" aria-label="TechInnoSphere on WhatsApp" className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center hover:bg-green-500 transition-colors text-gray-300 hover:text-white">
                   <MessageCircle className="w-5 h-5" />
                 </a>
               )}
@@ -63,6 +63,7 @@ const Footer = () => {
               <li><Link to="/" className="text-brand-lighter hover:text-white transition-colors">Home</Link></li>
               <li><Link to="/services" className="text-brand-lighter hover:text-white transition-colors">Services</Link></li>
               <li><Link to="/work" className="text-brand-lighter hover:text-white transition-colors">Work</Link></li>
+              <li><Link to="/testimonials" className="text-brand-lighter hover:text-white transition-colors">Testimonials</Link></li>
               <li><Link to="/about" className="text-brand-lighter hover:text-white transition-colors">About</Link></li>
               <li><Link to="/careers" className="text-brand-lighter hover:text-white transition-colors">Careers</Link></li>
               <li><Link to="/news" className="text-brand-lighter hover:text-white transition-colors">News</Link></li>
@@ -96,7 +97,7 @@ const Footer = () => {
         <div className="pt-8 border-t border-brand-dark flex flex-col md:flex-row justify-between items-center gap-4 text-brand-lighter text-sm">
           <p>{config.FooterContent || '© TechInnoSphere. All Rights Reserved.'}</p>
           <div className="flex gap-6">
-            <Link to="/admin" className="text-brand-dark hover:text-brand-lighter transition-colors">Admin Portal</Link>
+            <Link to="/admin" rel="nofollow" className="text-brand-dark hover:text-brand-lighter transition-colors">Admin Portal</Link>
           </div>
         </div>
       </div>

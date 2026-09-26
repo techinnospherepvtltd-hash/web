@@ -33,10 +33,7 @@ export const ConfigProvider = ({ children }) => {
 
       setConfig(resolvedData);
       
-      // Handle dynamic document title and favicon
-      if (resolvedData.CompanyName) {
-        document.title = resolvedData.CompanyName;
-      }
+      // Handle dynamic favicon
       if (resolvedData.Favicon) {
         let link = document.querySelector("link[rel~='icon']");
         if (!link) {

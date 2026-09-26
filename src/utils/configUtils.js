@@ -1,12 +1,5 @@
-import { fetchExcelData } from './excelUtils';
+import { getConfig } from './supabaseUtils';
 
 export const fetchConfig = async () => {
-  const data = await fetchExcelData('config.xlsx');
-  const config = {};
-  data.forEach(item => {
-    if (item.Key && item.Value) {
-      config[item.Key] = item.Value;
-    }
-  });
-  return config;
+  return await getConfig();
 };

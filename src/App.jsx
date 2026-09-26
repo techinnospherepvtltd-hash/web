@@ -13,6 +13,8 @@ import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import News from './pages/News';
 import Testimonials from './pages/Testimonials';
+import NotFound from './pages/NotFound';
+import Analytics from './components/Analytics';
 
 // Admin
 import AdminLayout from './admin/AdminLayout';
@@ -21,6 +23,7 @@ function App() {
   return (
     <ConfigProvider>
       <Router basename={import.meta.env.BASE_URL}>
+        <Analytics />
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">
@@ -36,6 +39,9 @@ function App() {
               
               {/* Admin Routes */}
               <Route path="/admin/*" element={<AdminLayout />} />
+
+              {/* Catch-all 404 Route */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />

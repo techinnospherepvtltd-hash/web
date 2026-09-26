@@ -2,25 +2,32 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, User } from 'lucide-react';
 import { useConfig } from '../context/ConfigContext';
+import { loginAdmin } from '../utils/supabaseUtils';
+import SEO from '../components/SEO';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const config = useConfig();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin123') {
-      localStorage.setItem('techinnosphere_auth', 'true');
+    setLoading(true);
+    setError('');
+    const result = await loginAdmin(username, password);
+    setLoading(false);
+    if (result.success) {
       onLogin(true);
     } else {
-      setError('Invalid credentials');
+      setError(result.error || 'Invalid credentials');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <SEO title="Admin Login | TechInnoSphere" noIndex={true} />
       <div className="absolute inset-0 bg-[#111827]/90 z-0"></div>
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
