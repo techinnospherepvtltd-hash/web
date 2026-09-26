@@ -8,7 +8,11 @@ if (typeof window !== 'undefined') {
   const originalWarn = console.warn;
   console.warn = (...args) => {
     const msg = args.map(a => (typeof a === 'string' ? a : (a?.stack || a?.message || ''))).join(' ');
-    if (msg.includes('feature_collector') || msg.includes('Initialize should be called only once')) {
+    if (
+      msg.includes('deprecated parameters for the initialization function') ||
+      msg.includes('feature_collector') ||
+      msg.includes('Initialize should be called only once')
+    ) {
       return;
     }
     originalWarn.apply(console, args);
