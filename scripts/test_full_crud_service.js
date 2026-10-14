@@ -17,8 +17,8 @@ const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY)
 // Login as admin
 async function setupAdmin() {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: 'admin@techinnosphere.com',
-    password: 'admin123'
+    email: 'madiadmin@techinnosphere.com',
+    password: 'Madi@2123'
   });
   if (error) throw error;
   console.log('Admin authenticated successfully.');

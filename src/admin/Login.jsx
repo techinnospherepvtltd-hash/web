@@ -63,7 +63,7 @@ const Login = ({ onLogin }) => {
                   type="text"
                   required
                   className="appearance-none rounded-xl relative block w-full px-3 py-4 pl-12 bg-[#FAFAFA] border border-gray-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 sm:text-sm font-medium transition-all"
-                  placeholder="Username (admin)"
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -79,7 +79,7 @@ const Login = ({ onLogin }) => {
                   type="password"
                   required
                   className="appearance-none rounded-xl relative block w-full px-3 py-4 pl-12 bg-[#FAFAFA] border border-gray-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 sm:text-sm font-medium transition-all"
-                  placeholder="Password (admin123)"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

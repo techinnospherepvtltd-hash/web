@@ -718,7 +718,10 @@ export const saveDatasetByFileName = async (fileName, datasetArray) => {
 // ---------------------------------------------------------
 export const loginAdmin = async (emailOrUsername, password) => {
   if (isSupabaseConfigured()) {
-    const email = emailOrUsername.includes('@') ? emailOrUsername.trim() : `${emailOrUsername.trim()}@techinnosphere.com`;
+    const rawInput = (emailOrUsername || '').trim();
+    const email = rawInput.includes('@') 
+      ? rawInput 
+      : (rawInput === 'admin' || rawInput === 'madiadmin' ? 'madiadmin@techinnosphere.com' : `${rawInput}@techinnosphere.com`);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -739,7 +742,8 @@ export const loginAdmin = async (emailOrUsername, password) => {
   }
 
   // Local Admin Fallback
-  if (emailOrUsername === 'admin' && password === 'admin123') {
+  const raw = (emailOrUsername || '').trim().toLowerCase();
+  if ((raw === 'madiadmin' || raw === 'admin' || raw === 'madiadmin@techinnosphere.com') && password === 'Madi@2123') {
     localStorage.setItem('techinnosphere_auth', 'true');
     return { success: true, localOnly: true };
   }
